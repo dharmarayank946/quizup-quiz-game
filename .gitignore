@@ -1,0 +1,25 @@
+# Temporary & local test artifacts
+scratch/
+tests/
+coverage/
+
+# Dependencies
+node_modules/
+
+# Environment & credentials
+.env
+.env.*
+*.local
+*.log
+
+# System files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDE & Editor artifacts
+.vscode/
+.idea/
+*.swp
+*.swo

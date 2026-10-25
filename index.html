@@ -1,0 +1,2411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuizUp ✦ Learn & Play — Mobile-Style Quiz Gaming Hub</title>
+  <meta name="description" content="QuizUp is a premier quiz gaming platform inspired by QuizWiz. Compete on leaderboards, challenge the computer bot, pass & play with friends, earn coins, unlock badges, and master 6 versatile disciplines.">
+
+  <!-- Google Fonts: Plus Jakarta Sans for a clean, modern aesthetic -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&family=Lexend:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Confetti Container for Celebration Micro-interactions -->
+  <div class="confetti-container" id="confettiContainer" aria-hidden="true"></div>
+
+  <!-- ========================================== -->
+  <!-- SCREEN 11: SPLASH SCREEN (Auto-dismisses) -->
+  <!-- ========================================== -->
+  <div class="splash-overlay" id="splashScreen" role="dialog" aria-modal="true" aria-label="Loading QuizUp">
+    <div class="splash-card">
+      <div class="splash-logo-circle" aria-hidden="true">
+        <span>⚡</span>
+      </div>
+      <div>
+        <h1 class="splash-title">QuizUp <span class="logo-sparkle">✦</span></h1>
+        <p class="splash-tagline">Play, Learn, Compete & Win!</p>
+      </div>
+      <div class="splash-progress-track">
+        <div class="splash-progress-fill"></div>
+      </div>
+      <button type="button" class="splash-skip-btn" id="splashSkipBtn">Tap to Enter ⚡</button>
+    </div>
+  </div>
+
+  <!-- Global App Wrapper -->
+  <div class="app-container">
+
+    <!-- Top Navigation Bar -->
+    <header class="app-header">
+      <div class="header-inner container">
+        <a href="#" class="brand-logo" id="logoLink" aria-label="QuizUp Home">
+          <div class="logo-mark" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+          </div>
+          <div class="logo-text-group">
+            <span class="logo-text">QuizUp <span class="logo-sparkle">✦</span></span>
+            <span class="logo-subtext">Gaming Edition</span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <nav class="nav-links" aria-label="Main Navigation">
+          <button type="button" class="nav-btn" id="navHomeBtn" aria-label="Dashboard">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <span>Home</span>
+          </button>
+        </nav>
+
+        <!-- Header Gaming Badges (Coins, Streak, Sound, Avatar) -->
+        <div class="header-gaming-group">
+          <button type="button" class="coin-badge-pill" id="headerCoinBadge" title="Your Coins (Click to View Rewards)" aria-label="150 Coins">
+            <span class="coin-icon-spin" aria-hidden="true">🪙</span>
+            <span id="playerCoinsCount">150</span>
+          </button>
+
+          <span class="streak-badge-pill" id="headerStreakBadge" title="Current Daily Streak">
+            <span aria-hidden="true">🔥</span>
+            <span id="playerStreakCount">1</span>
+          </span>
+
+          <button type="button" class="header-icon-btn" id="headerSoundBtn" title="Toggle Sound Chimes" aria-label="Toggle Sound">
+            <span id="soundIcon">🔊</span>
+          </button>
+
+          <button type="button" class="header-avatar-btn" id="headerAvatarBtn" title="Profile & Avatar" aria-label="Open Profile">
+            <span id="headerAvatarEmoji">🦊</span>
+            <img id="headerAvatarImg" alt="Profile" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Area: Views switch dynamically -->
+    <main class="main-content container" id="mainContent">
+
+      <!-- ========================================== -->
+      <!-- SCREEN 1: LEADERBOARD (First on App Launch) -->
+      <!-- ========================================== -->
+      <section class="view-section active" id="viewLeaderboard" aria-labelledby="leaderboardTitle">
+        <div class="leaderboard-container">
+          <div class="leaderboard-header">
+            <span class="leaderboard-title-badge">👑 Global Standings</span>
+            <h1 id="leaderboardTitle" class="leaderboard-title">Leaderboard</h1>
+            <p class="leaderboard-subtitle">Climb the ranks, earn coins, and showcase your intellectual prowess.</p>
+          </div>
+
+          <div class="leaderboard-actions-cluster" style="display: flex; gap: 12px; justify-content: center; align-items: center; margin-bottom: 18px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary" id="leaderboardToDashboardBtn" style="padding: 11px 24px; font-size: 0.95rem;">
+              <span>🏠 Main Dashboard</span>
+            </button>
+            <button type="button" class="btn btn-primary" id="leaderboardPlayNowBtn" style="padding: 11px 32px; font-size: 0.98rem; box-shadow: 0 4px 18px rgba(124, 58, 237, 0.35);">
+              <span>Play Now ⚡</span>
+            </button>
+          </div>
+          <!-- Timeframe Selector Tabs -->
+          <div class="timeframe-tab-bar" role="tablist" aria-label="Leaderboard timeframe">
+            <button type="button" class="timeframe-tab active" data-timeframe="today" role="tab" aria-selected="true" id="tabToday">Today</button>
+            <button type="button" class="timeframe-tab" data-timeframe="weekly" role="tab" aria-selected="false" id="tabWeekly">Weekly</button>
+            <button type="button" class="timeframe-tab" data-timeframe="alltime" role="tab" aria-selected="false" id="tabAllTime">All-Time</button>
+          </div>
+
+          <!-- Category Filter Chips -->
+          <div class="leaderboard-category-bar" role="tablist" aria-label="Leaderboard discipline filter" id="leaderboardCategoryBar">
+            <button type="button" class="lb-category-pill active" data-cat="all" role="tab" aria-selected="true" id="filterCatAll">
+              <span class="pill-icon">✨</span>
+              <span class="pill-text">All Disciplines</span>
+            </button>
+            <button type="button" class="lb-category-pill" data-cat="technology" role="tab" aria-selected="false" id="filterCatTech">
+              <span class="pill-icon">💻</span>
+              <span class="pill-text">Technology</span>
+            </button>
+            <button type="button" class="lb-category-pill" data-cat="academics" role="tab" aria-selected="false" id="filterCatAcademics">
+              <span class="pill-icon">📚</span>
+              <span class="pill-text">Academics</span>
+            </button>
+            <button type="button" class="lb-category-pill" data-cat="general" role="tab" aria-selected="false" id="filterCatGeneral">
+              <span class="pill-icon">🌍</span>
+              <span class="pill-text">General</span>
+            </button>
+            <button type="button" class="lb-category-pill" data-cat="competitive" role="tab" aria-selected="false" id="filterCatCompetitive">
+              <span class="pill-icon">⚡</span>
+              <span class="pill-text">Competitive Exams</span>
+            </button>
+            <button type="button" class="lb-category-pill" data-cat="sports" role="tab" aria-selected="false" id="filterCatSports">
+              <span class="pill-icon">⚽</span>
+              <span class="pill-text">Sports</span>
+            </button>
+            <button type="button" class="lb-category-pill" data-cat="entertainment" role="tab" aria-selected="false" id="filterCatEntertainment">
+              <span class="pill-icon">🎬</span>
+              <span class="pill-text">Entertainment</span>
+            </button>
+          </div>
+
+          <!-- Professional Community Standings Card -->
+          <div class="community-standings-card" role="note" aria-label="Community Standings Notice">
+            <div class="standings-card-icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+            </div>
+            <div class="standings-card-content">
+              <strong class="standings-card-title">Community Standings</strong>
+              <p class="standings-card-text">Your local ranking and simulated community competitors are shown using data stored on this device. Live rankings across multiple users and devices require a central server.</p>
+            </div>
+          </div>
+
+          <!-- Top 3 Podium Cards -->
+          <div class="podium-section" id="podiumContainer" aria-label="Top 3 Leaders">
+            <!-- Rendered via JS -->
+          </div>
+
+          <!-- Sticky "Your Rank" Strip -->
+          <div class="user-rank-strip" id="userRankStrip">
+            <div class="user-rank-left">
+              <span class="user-rank-badge" id="userRankPos">#4</span>
+              <div class="user-rank-info">
+                <h4 id="userRankName">You (QuizMaster)</h4>
+                <p id="userRankSubtitle">Mastery Level 1 • Rising Challenger</p>
+              </div>
+            </div>
+            <div class="user-rank-right">
+              <span aria-hidden="true">🪙</span>
+              <span id="userRankCoins">150</span>
+            </div>
+          </div>
+
+          <!-- Interactive Search & Live Controls Bar -->
+          <div class="leaderboard-controls-bar">
+            <div class="leaderboard-search-wrap">
+              <span class="search-input-icon" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </span>
+              <input type="text" id="leaderboardSearchInput" class="leaderboard-search-input" placeholder="Search players by name..." aria-label="Search players by name">
+              <button type="button" class="search-clear-btn" id="leaderboardSearchClearBtn" aria-label="Clear search query" style="display: none;">✕</button>
+            </div>
+            <div class="leaderboard-actions-row">
+              <span class="leaderboard-status-tag" id="leaderboardStatusTag" title="Local storage dataset">
+                <span class="status-dot-pulse" aria-hidden="true"></span>
+                <span id="leaderboardUpdatedTime">Updated just now</span>
+              </span>
+              <button type="button" class="btn-refresh-leaderboard" id="leaderboardRefreshBtn" title="Refresh standings from local device data" aria-label="Refresh leaderboard standings">
+                <svg id="refreshIconSvg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                <span>Refresh</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Leaderboard List -->
+          <div class="leaderboard-list" id="leaderboardList" role="list">
+            <!-- Rendered via JS -->
+          </div>
+
+          <!-- Section 2: Your Daily Growth Tip -->
+          <div class="daily-growth-tip-card" id="leaderboardGrowthTipCard" role="region" aria-label="Your Daily Growth Tip">
+            <!-- Rendered via JS renderDailyGrowthTip() -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SCREEN 2: HOME / DASHBOARD                 -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewHome" aria-labelledby="heroTitle">
+        <!-- Hero Section with Friendly Greeting -->
+        <div class="hero-card">
+          <div class="hero-content">
+            <div class="hero-badge-row">
+              <span class="badge badge-accent">QuizWiz Edition • Premium Learning Hub</span>
+              <span class="badge badge-subtle">270 Practice Questions</span>
+            </div>
+            <h1 id="heroTitle" class="hero-title">
+              <span id="welcomeGreeting">Welcome</span>, Learner! 👋<br>
+              Master something new, one question at a time.
+            </h1>
+            <p class="hero-subtitle">
+              Challenge your intellect across 6 versatile disciplines, take on the Daily Spark challenge, and track your streak with immediate rationale and timed exam practice.
+            </p>
+            <div class="hero-actions">
+              <button type="button" class="btn btn-primary" id="heroStartBtn">
+                <span>Start a Quiz</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+              <button type="button" class="btn btn-sparkle" id="heroDailyBtn">
+                <span>Daily Spark ⚡</span>
+              </button>
+              <a href="#categoriesSection" class="btn btn-secondary" id="browseCategoriesBtn">
+                <span>Explore Categories</span>
+              </a>
+            </div>
+
+            <!-- Quick Stats Ribbon in Hero -->
+            <div class="hero-stats-ribbon">
+              <div class="hero-stat-item">
+                <span class="hero-stat-num" id="dashTotalQuizzes">0</span>
+                <span class="hero-stat-desc">Quizzes Completed</span>
+              </div>
+              <div class="hero-stat-divider"></div>
+              <div class="hero-stat-item">
+                <span class="hero-stat-num" id="dashAvgAccuracy">0%</span>
+                <span class="hero-stat-desc">Avg. Accuracy</span>
+              </div>
+              <div class="hero-stat-divider"></div>
+              <div class="hero-stat-item">
+                <span class="hero-stat-num" id="dashBestScore">--</span>
+                <span class="hero-stat-desc">Best Score</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-visual" aria-hidden="true">
+            <div class="floating-stat-card stat-card-1">
+              <div class="stat-icon-wrap lavender">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              </div>
+              <div class="stat-text">
+                <span class="stat-label">Disciplines</span>
+                <span class="stat-value">6 Categories</span>
+              </div>
+            </div>
+            <div class="floating-stat-card stat-card-2">
+              <div class="stat-icon-wrap emerald">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              </div>
+              <div class="stat-text">
+                <span class="stat-label">Study Modes</span>
+                <span class="stat-value">Learning & Exam</span>
+              </div>
+            </div>
+            <div class="floating-stat-card stat-card-3">
+              <div class="stat-icon-wrap pink">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              </div>
+              <div class="stat-text">
+                <span class="stat-label">Daily Spark</span>
+                <span class="stat-value">5-Question Sprint</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Your Daily Growth Tip on Dashboard -->
+        <div class="daily-growth-tip-card dashboard-tip-card" id="dashboardGrowthTipCard" role="region" aria-label="Your Daily Growth Tip">
+          <!-- Rendered via JS renderDailyGrowthTip() -->
+        </div>
+
+        <!-- QuizBuddy Spotlight Card on Dashboard -->
+        <div class="quizbuddy-spotlight-card" id="quizBuddyDashboardCard" role="region" aria-label="QuizBuddy Assistant Card">
+          <div class="qb-spotlight-inner">
+            <div class="qb-spotlight-left">
+              <div class="qb-spotlight-avatar" aria-hidden="true">🤖</div>
+              <div class="qb-spotlight-text">
+                <span class="qb-badge">LOCAL LEARNING COMPANION</span>
+                <h3 class="qb-title">Meet QuizBuddy — Your Interactive Study Assistant</h3>
+                <p class="qb-desc">Have questions about a quiz topic or missed an answer? Ask QuizBuddy for beginner-friendly explanations and instant concept drills.</p>
+                <div class="qb-prompts-preview">
+                  <button type="button" class="qb-quick-prompt-btn" data-prompt="Why is my answer incorrect?">💡 Why is my answer incorrect?</button>
+                  <button type="button" class="qb-quick-prompt-btn" data-prompt="Explain this topic simply">📖 Explain this topic simply</button>
+                  <button type="button" class="qb-quick-prompt-btn" data-prompt="Quiz me on this topic">🎯 Quiz me on a topic</button>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="btn btn-primary" id="openQuizBuddyBtn">Chat with QuizBuddy 🤖</button>
+          </div>
+        </div>
+
+        <!-- Daily Challenge & Featured Quizzes Banner -->
+        <div class="section-block daily-featured-wrap">
+          <div class="daily-card" id="dailyChallengeCard">
+            <div class="daily-badge-row">
+              <span class="daily-pill">DAILY CHALLENGE ⚡</span>
+              <span class="daily-timer-hint">Quick 3-Min Sprint</span>
+            </div>
+            <div class="daily-content">
+              <h3 class="daily-title">Today's Knowledge Spark</h3>
+              <p class="daily-desc">Sharpen your reflexes with a 5-question daily practice session across mixed disciplines with instant conceptual explanations.</p>
+            </div>
+            <button type="button" class="btn btn-sparkle-large" id="dailySparkCardBtn">
+              <span>Launch Daily Spark</span>
+              <span class="arrow-sparkle">⚡</span>
+            </button>
+          </div>
+
+          <!-- Featured Quizzes Bar -->
+          <div class="featured-strip">
+            <h4 class="featured-strip-title">🔥 Featured Practice Sets</h4>
+            <div class="featured-cards-grid">
+              <button type="button" class="featured-mini-card" data-quick-cat="technology" data-quick-diff="easy">
+                <span class="mini-icon purple">💻</span>
+                <div class="mini-info">
+                  <span class="mini-title">Coding Foundations</span>
+                  <span class="mini-sub">HTML, CSS & JS Basics</span>
+                </div>
+                <span class="mini-arrow">→</span>
+              </button>
+              <button type="button" class="featured-mini-card" data-quick-cat="competitive" data-quick-diff="medium">
+                <span class="mini-icon indigo">🧠</span>
+                <div class="mini-info">
+                  <span class="mini-title">Logical Reasoning</span>
+                  <span class="mini-sub">Aptitude & Puzzles</span>
+                </div>
+                <span class="mini-arrow">→</span>
+              </button>
+              <button type="button" class="featured-mini-card" data-quick-cat="academics" data-quick-diff="medium">
+                <span class="mini-icon teal">🔬</span>
+                <div class="mini-info">
+                  <span class="mini-title">Scientific Discovery</span>
+                  <span class="mini-sub">Physics, Chem & Bio</span>
+                </div>
+                <span class="mini-arrow">→</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6 Subject Categories Grid Section -->
+        <div class="section-block" id="categoriesSection">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">Explore by Category</h2>
+              <p class="section-subtitle">Pick any discipline below to configure your custom practice session.</p>
+            </div>
+          </div>
+
+          <div class="category-grid" id="categoryGrid" role="list">
+            <!-- 1. Technology -->
+            <div class="category-card" data-category="technology" role="listitem" tabindex="0" aria-label="Technology, 45 questions. Web development, HTML5, CSS cascading, modern JavaScript, and logic. Click to configure quiz.">
+              <div class="category-icon-box lavender">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="16 18 22 12 16 6"></polyline>
+                  <polyline points="8 6 2 12 8 18"></polyline>
+                </svg>
+              </div>
+              <div class="category-info">
+                <div class="category-header-row">
+                  <h3 class="category-name">Technology</h3>
+                  <span class="category-pill tech-pill">Tech</span>
+                </div>
+                <p class="category-desc">Web development, HTML5, CSS cascading, modern JavaScript, programming logic, and debugging.</p>
+              </div>
+              <div class="category-card-footer">
+                <span class="category-count-badge">45 Questions</span>
+                <span class="category-action-text">Start Quiz <span class="arrow-circle">→</span></span>
+              </div>
+            </div>
+
+            <!-- 2. Academics -->
+            <div class="category-card" data-category="academics" role="listitem" tabindex="0" aria-label="Academics, 45 questions. Physics, chemistry, cellular biology, genetics, and astronomy. Click to configure quiz.">
+              <div class="category-icon-box teal">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10 2v7.31L4.35 19.3A2 2 0 0 0 6.07 22h11.86a2 2 0 0 0 1.72-2.7L14 9.31V2"></path>
+                  <line x1="8.5" y1="2" x2="15.5" y2="2"></line>
+                  <line x1="7" y1="16" x2="17" y2="16"></line>
+                </svg>
+              </div>
+              <div class="category-info">
+                <div class="category-header-row">
+                  <h3 class="category-name">Academics</h3>
+                  <span class="category-pill science-pill">Science</span>
+                </div>
+                <p class="category-desc">Physics, chemistry, cellular biology, genetics, and astronomy for school & college students.</p>
+              </div>
+              <div class="category-card-footer">
+                <span class="category-count-badge">45 Questions</span>
+                <span class="category-action-text">Start Quiz <span class="arrow-circle">→</span></span>
+              </div>
+            </div>
+
+            <!-- 3. General Knowledge -->
+            <div class="category-card" data-category="general" role="listitem" tabindex="0" aria-label="General Knowledge, 45 questions. World geography, historical turning points, milestone discoveries, and global facts. Click to configure quiz.">
+              <div class="category-icon-box amber">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="2" y1="12" x2="22" y2="12"></line>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+              </div>
+              <div class="category-info">
+                <div class="category-header-row">
+                  <h3 class="category-name">General Knowledge</h3>
+                  <span class="category-pill trivia-pill">Trivia</span>
+                </div>
+                <p class="category-desc">World geography, historical turning points, milestone discoveries, treaties, and global facts.</p>
+              </div>
+              <div class="category-card-footer">
+                <span class="category-count-badge">45 Questions</span>
+                <span class="category-action-text">Start Quiz <span class="arrow-circle">→</span></span>
+              </div>
+            </div>
+
+            <!-- 4. Competitive Exams -->
+            <div class="category-card" data-category="competitive" role="listitem" tabindex="0" aria-label="Competitive Exams, 45 questions. Quantitative arithmetic, percentages, speed-distance-time, and deductive reasoning. Click to configure quiz.">
+              <div class="category-icon-box indigo">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="2" width="16" height="20" rx="2"></rect>
+                  <line x1="8" y1="6" x2="16" y2="6"></line>
+                  <line x1="16" y1="14" x2="16" y2="18"></line>
+                  <path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M8 18h.01M12 18h.01"></path>
+                </svg>
+              </div>
+              <div class="category-info">
+                <div class="category-header-row">
+                  <h3 class="category-name">Competitive Exams</h3>
+                  <span class="category-pill logic-pill">Aptitude</span>
+                </div>
+                <p class="category-desc">Quantitative arithmetic, percentages, speed-distance-time, syllogisms, and deductive reasoning.</p>
+              </div>
+              <div class="category-card-footer">
+                <span class="category-count-badge">45 Questions</span>
+                <span class="category-action-text">Start Quiz <span class="arrow-circle">→</span></span>
+              </div>
+            </div>
+
+            <!-- 5. Sports -->
+            <div class="category-card" data-category="sports" role="listitem" tabindex="0" aria-label="Sports, 45 questions. Olympic games, football, cricket, tennis, world records, and legendary champions. Click to configure quiz.">
+              <div class="category-icon-box coral">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M14.83 9.17l4.24-4.24M4.93 19.07l4.24-4.24"></path>
+                </svg>
+              </div>
+              <div class="category-info">
+                <div class="category-header-row">
+                  <h3 class="category-name">Sports</h3>
+                  <span class="category-pill sports-pill">Athletics</span>
+                </div>
+                <p class="category-desc">Olympic games, football, cricket, tennis, world records, athletics, and legendary sports champions.</p>
+              </div>
+              <div class="category-card-footer">
+                <span class="category-count-badge">45 Questions</span>
+                <span class="category-action-text">Start Quiz <span class="arrow-circle">→</span></span>
+              </div>
+            </div>
+
+            <!-- 6. Entertainment -->
+            <div class="category-card" data-category="entertainment" role="listitem" tabindex="0" aria-label="Entertainment, 45 questions. Academy Awards, international cinema, classic and modern music, and literature. Click to configure quiz.">
+              <div class="category-icon-box pink">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+              </div>
+              <div class="category-info">
+                <div class="category-header-row">
+                  <h3 class="category-name">Entertainment</h3>
+                  <span class="category-pill media-pill">Cinema & Arts</span>
+                </div>
+                <p class="category-desc">Academy Awards, international cinema, classic and modern music, literature, and pop culture.</p>
+              </div>
+              <div class="category-card-footer">
+                <span class="category-count-badge">45 Questions</span>
+                <span class="category-action-text">Start Quiz <span class="arrow-circle">→</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mode Entry Cards Section -->
+        <div class="section-block modes-showcase-grid">
+          <div class="mode-showcase-card learning-showcase">
+            <div class="mode-showcase-badge lavender">Learning Mode</div>
+            <h3 class="mode-showcase-title">Immediate Feedback & Deep Explanations</h3>
+            <p class="mode-showcase-desc">Take your time with zero time pressure. Each answer reveals an immediate conceptual breakdown and rationale to help build lasting knowledge.</p>
+            <button type="button" class="btn btn-secondary btn-full" id="dashStartLearningBtn">
+              <span>Practice in Learning Mode</span>
+            </button>
+          </div>
+
+          <div class="mode-showcase-card exam-showcase">
+            <div class="mode-showcase-badge amber">Exam Mode</div>
+            <h3 class="mode-showcase-title">Timed Countdown & Comprehensive Review</h3>
+            <p class="mode-showcase-desc">Simulate realistic test conditions with an active countdown clock. Answers and mistake analysis are revealed in a full post-test report.</p>
+            <button type="button" class="btn btn-primary btn-full" id="dashStartExamBtn">
+              <span>Challenge Exam Mode</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Dashboard Insights: Best Scores & Recent Attempts -->
+        <div class="section-block insights-grid">
+          <!-- Recent Attempts Card -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title-wrap">
+                <span class="panel-icon lavender">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                </span>
+                <h3 class="panel-title">Recent Attempts</h3>
+              </div>
+              <button type="button" class="btn-text-subtle" id="clearHistoryBtn" title="Clear recorded attempts">Clear</button>
+            </div>
+            <div class="panel-body" id="recentAttemptsContainer">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Best Scores / Performance Overview -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title-wrap">
+                <span class="panel-icon amber">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1v-2.34"></path><path d="M18 14.66V17c0 .55-.45 1-1 1h-2c-.55 0-1-.45-1-1v-2.34"></path><path d="M6 2h12v7a6 6 0 0 1-12 0V2z"></path></svg>
+                </span>
+                <h3 class="panel-title">Category Best Scores</h3>
+              </div>
+              <span class="panel-badge">Tracked</span>
+            </div>
+            <div class="panel-body" id="bestScoresContainer">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SCREEN 3: PLAY HUB (Game Modes)            -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewPlay" aria-labelledby="playHubTitle">
+        <div class="view-header">
+          <div>
+            <h1 id="playHubTitle" class="section-title">Play Arena</h1>
+            <p class="section-subtitle">Choose your battleground: test yourself solo, challenge our AI bot, or pass & play with a friend.</p>
+          </div>
+        </div>
+
+        <div class="play-hub-grid">
+          <!-- 1. Solo Mode -->
+          <div class="play-mode-card" id="playModeSoloCard" tabindex="0" role="button" aria-label="Solo Mode. Practice in Learning or Exam Mode.">
+            <span class="play-mode-badge badge-solo">Practice</span>
+            <div class="play-mode-icon-box solo-box" aria-hidden="true">
+              <span>🎯</span>
+            </div>
+            <div class="play-mode-info">
+              <h3>Solo Challenge</h3>
+              <p>Practice across 6 disciplines with customizable difficulty, instant feedback, or strict exam countdown.</p>
+            </div>
+            <div class="play-mode-cta">
+              <span>Configure & Start</span>
+              <span>→</span>
+            </div>
+          </div>
+
+          <!-- 2. Play Against Computer -->
+          <div class="play-mode-card featured-mode" id="playModeBotCard" tabindex="0" role="button" aria-label="Play Against Computer. Challenge ByteBot AI.">
+            <span class="play-mode-badge badge-bot">AI Battle</span>
+            <div class="play-mode-icon-box bot-box" aria-hidden="true">
+              <span>🤖</span>
+            </div>
+            <div class="play-mode-info">
+              <h3>Play vs Computer</h3>
+              <p>Battle ByteBot in a live head-to-head arena. Features simulated response latency and adaptive strategy.</p>
+            </div>
+            <div class="play-mode-cta">
+              <span>Challenge ByteBot</span>
+              <span>⚡</span>
+            </div>
+          </div>
+
+          <!-- 3. Play With a Friend -->
+          <div class="play-mode-card" id="playModeFriendCard" tabindex="0" role="button" aria-label="Play With a Friend. Two player pass and play on this device.">
+            <span class="play-mode-badge badge-pass">Pass & Play</span>
+            <div class="play-mode-icon-box friend-box" aria-hidden="true">
+              <span>👥</span>
+            </div>
+            <div class="play-mode-info">
+              <h3>Play With a Friend</h3>
+              <p>Two players compete on the same device! Take turns answering questions to see who claims ultimate victory.</p>
+            </div>
+            <div class="play-mode-cta">
+              <span>Start Friend Match</span>
+              <span>→</span>
+            </div>
+          </div>
+
+          <!-- 4. Multiplayer Demo Room -->
+          <div class="play-mode-card" id="playModeMultiCard" tabindex="0" role="button" aria-label="Multiplayer Room Demo. Create or join a private room.">
+            <span class="play-mode-badge badge-demo">Demo Room</span>
+            <div class="play-mode-icon-box multi-box" aria-hidden="true">
+              <span>🌐</span>
+            </div>
+            <div class="play-mode-info">
+              <h3>Multiplayer Room</h3>
+              <p>Create or join private room lobbies with unique room codes. Explore the interactive lobby simulation.</p>
+            </div>
+            <div class="play-mode-cta">
+              <span>Enter Lobby Demo</span>
+              <span>→</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SCREEN 4: DISCOVER & TOPIC SEARCH          -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewDiscover" aria-labelledby="discoverTitle">
+        <div class="view-header">
+          <div>
+            <h1 id="discoverTitle" class="section-title">Discover Quizzes & Challenges 🔍</h1>
+            <p class="section-subtitle">Search through 270 curated questions across 6 core disciplines and 7 interactive challenge formats.</p>
+          </div>
+        </div>
+
+        <!-- Interactive Search Bar -->
+        <div class="discover-search-box">
+          <div class="discover-search-input-wrap">
+            <span class="search-icon-lens" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </span>
+            <input type="search" id="discoverSearchInput" placeholder="Search by subject, topic (e.g. Python, Newton, DNA), or format..." class="discover-input" aria-label="Search quizzes and topics">
+            <button type="button" class="discover-search-clear" id="discoverSearchClearBtn" aria-label="Clear search" style="display: none;">✕</button>
+          </div>
+        </div>
+
+        <!-- Comprehensive Multi-Axis Filter Cluster -->
+        <div class="discover-filter-cluster">
+          <!-- 1. Category Filter Strip -->
+          <div class="discover-filter-group">
+            <span class="discover-filter-label">Discipline:</span>
+            <div class="discover-pill-strip" id="discoverCategoryFilterBar" role="tablist" aria-label="Filter by discipline">
+              <button type="button" class="discover-chip active-chip" data-cat="all">All (270)</button>
+              <button type="button" class="discover-chip" data-cat="technology">💻 Technology (45)</button>
+              <button type="button" class="discover-chip" data-cat="academics">📚 Academics (45)</button>
+              <button type="button" class="discover-chip" data-cat="general">🌍 General (45)</button>
+              <button type="button" class="discover-chip" data-cat="competitive">⚡ Competitive (45)</button>
+              <button type="button" class="discover-chip" data-cat="sports">⚽ Sports (45)</button>
+              <button type="button" class="discover-chip" data-cat="entertainment">🎬 Entertainment (45)</button>
+            </div>
+          </div>
+
+          <!-- 2. Difficulty Filter Strip -->
+          <div class="discover-filter-group">
+            <span class="discover-filter-label">Difficulty:</span>
+            <div class="discover-pill-strip" id="discoverDiffFilterBar" role="tablist" aria-label="Filter by difficulty">
+              <button type="button" class="discover-chip active-chip" data-diff="all">All Difficulties</button>
+              <button type="button" class="discover-chip" data-diff="easy">🟢 Easy (90)</button>
+              <button type="button" class="discover-chip" data-diff="medium">🟡 Medium (90)</button>
+              <button type="button" class="discover-chip" data-diff="hard">🔴 Hard (90)</button>
+            </div>
+          </div>
+
+          <!-- 3. Format / Game Mode Filter Strip -->
+          <div class="discover-filter-group">
+            <span class="discover-filter-label">Challenge Format:</span>
+            <div class="discover-pill-strip" id="discoverFormatFilterBar" role="tablist" aria-label="Filter by format">
+              <button type="button" class="discover-chip active-chip" data-format="all">All Modes</button>
+              <button type="button" class="discover-chip" data-format="standard">🎯 Standard Practice</button>
+              <button type="button" class="discover-chip" data-format="speed">⚡ Speed Sprint</button>
+              <button type="button" class="discover-chip" data-format="tf">⚖️ True or False</button>
+              <button type="button" class="discover-chip" data-format="word">🔤 Word Puzzle</button>
+              <button type="button" class="discover-chip" data-format="memory">🧠 Memory Match</button>
+              <button type="button" class="discover-chip" data-format="survival">🛡️ Survival (3 Lives)</button>
+              <button type="button" class="discover-chip" data-format="riddles">🔮 Riddles</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Personalized Recommendation Card (Derived from local history) -->
+        <div class="discover-recommend-card" id="discoverRecommendCard">
+          <!-- Rendered dynamically via renderDiscoverRecommendations() -->
+        </div>
+
+        <!-- Recently Played Quizzes Strip -->
+        <div class="discover-recent-section" id="discoverRecentSection">
+          <div class="discover-section-header">
+            <h3 class="discover-section-title">⏱️ Recently Played Quizzes</h3>
+            <span class="discover-section-sub" id="discoverRecentCountText">From your local attempts history</span>
+          </div>
+          <div class="discover-recent-list" id="discoverRecentList">
+            <!-- Rendered dynamically via renderDiscoverRecent() -->
+          </div>
+        </div>
+
+        <!-- Verified Disciplines Grid -->
+        <div class="discover-section-header" style="margin-top: 28px;">
+          <h3 class="discover-section-title">📚 Core Academic & Gaming Disciplines</h3>
+          <span class="discover-section-sub">45 curated multiple-choice questions per discipline</span>
+        </div>
+        <div class="category-grid" id="discoverCategoryGrid">
+          <!-- Populated or mapped via JS -->
+        </div>
+
+        <!-- Supported Interactive Challenge Formats Grid -->
+        <div class="discover-section-header" style="margin-top: 32px;" id="discoverSpecialtyHeader">
+          <h3 class="discover-section-title">🎮 Supported Challenge Formats</h3>
+          <span class="discover-section-sub">Different ways to test your speed, logic, and memory</span>
+        </div>
+        <div class="discover-formats-grid" id="discoverFormatsGrid">
+          <!-- Rendered via JS -->
+        </div>
+
+        <!-- Clear Empty Search State -->
+        <div class="discover-empty-state" id="discoverEmptyState" style="display: none;">
+          <div style="font-size: 2.4rem; margin-bottom: 8px;">🔍</div>
+          <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 6px;">No Matching Quizzes Found</h3>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 16px;" id="discoverEmptyDesc">We couldn't find any quizzes matching your search and filter criteria.</p>
+          <button type="button" class="btn btn-secondary" id="discoverResetFiltersBtn">Clear All Filters</button>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SCREEN 5: QUIZ SETUP FORM                  -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewSetup" aria-labelledby="setupTitle">
+        <!-- Setup Header & Breadcrumb -->
+        <div class="view-header">
+          <button type="button" class="btn-back" id="setupBackBtn" aria-label="Go back to Dashboard">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            <span>Back to Dashboard</span>
+          </button>
+          <span class="view-step-indicator">Step 1 of 2 • Configure Quiz</span>
+        </div>
+
+        <div class="setup-wrapper">
+          <div class="setup-main-card">
+            <div class="setup-heading-group">
+              <h1 id="setupTitle" class="setup-title">Configure Your Quiz</h1>
+              <p class="setup-desc">Tailor the subject, challenge level, and learning mode to match your current study goals.</p>
+            </div>
+
+            <form id="quizSetupForm" class="setup-form" onsubmit="return false;">
+              <!-- 1. Category Selection: 6 Categories -->
+              <div class="form-group">
+                <label class="form-label" id="categoryLabel">1. Choose Subject</label>
+                <div class="setup-pill-grid" role="radiogroup" aria-labelledby="categoryLabel">
+                  <label class="setup-pill-option">
+                    <input type="radio" name="setupCategory" value="technology" checked>
+                    <span class="pill-card">
+                      <span class="pill-dot dot-tech"></span>
+                      <span class="pill-text">Technology</span>
+                    </span>
+                  </label>
+                  <label class="setup-pill-option">
+                    <input type="radio" name="setupCategory" value="academics">
+                    <span class="pill-card">
+                      <span class="pill-dot dot-science"></span>
+                      <span class="pill-text">Academics</span>
+                    </span>
+                  </label>
+                  <label class="setup-pill-option">
+                    <input type="radio" name="setupCategory" value="general">
+                    <span class="pill-card">
+                      <span class="pill-dot dot-trivia"></span>
+                      <span class="pill-text">General Knowledge</span>
+                    </span>
+                  </label>
+                  <label class="setup-pill-option">
+                    <input type="radio" name="setupCategory" value="competitive">
+                    <span class="pill-card">
+                      <span class="pill-dot dot-logic"></span>
+                      <span class="pill-text">Competitive Exams</span>
+                    </span>
+                  </label>
+                  <label class="setup-pill-option">
+                    <input type="radio" name="setupCategory" value="sports">
+                    <span class="pill-card">
+                      <span class="pill-dot dot-sports"></span>
+                      <span class="pill-text">Sports</span>
+                    </span>
+                  </label>
+                  <label class="setup-pill-option">
+                    <input type="radio" name="setupCategory" value="entertainment">
+                    <span class="pill-card">
+                      <span class="pill-dot dot-pink"></span>
+                      <span class="pill-text">Entertainment</span>
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- 2. Difficulty Level -->
+              <div class="form-group">
+                <label class="form-label" id="difficultyLabel">2. Select Difficulty</label>
+                <div class="difficulty-cards" role="radiogroup" aria-labelledby="difficultyLabel">
+                  <label class="difficulty-card-option">
+                    <input type="radio" name="setupDifficulty" value="easy" checked>
+                    <div class="difficulty-box">
+                      <div class="difficulty-header">
+                        <span class="diff-indicator diff-easy"></span>
+                        <span class="diff-name">Easy</span>
+                      </div>
+                      <p class="diff-desc">Gentle practice questions for building core confidence.</p>
+                    </div>
+                  </label>
+                  <label class="difficulty-card-option">
+                    <input type="radio" name="setupDifficulty" value="medium">
+                    <div class="difficulty-box">
+                      <div class="difficulty-header">
+                        <span class="diff-indicator diff-medium"></span>
+                        <span class="diff-name">Medium</span>
+                      </div>
+                      <p class="diff-desc">Standard depth with balanced analytical puzzles.</p>
+                    </div>
+                  </label>
+                  <label class="difficulty-card-option">
+                    <input type="radio" name="setupDifficulty" value="hard">
+                    <div class="difficulty-box">
+                      <div class="difficulty-header">
+                        <span class="diff-indicator diff-hard"></span>
+                        <span class="diff-name">Hard</span>
+                      </div>
+                      <p class="diff-desc">Challenging questions designed for true subject mastery.</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <!-- 3. Quiz Mode -->
+              <div class="form-group">
+                <label class="form-label" id="modeLabel">3. Choose Learning Experience</label>
+                <div class="mode-cards" role="radiogroup" aria-labelledby="modeLabel">
+                  <label class="mode-card-option">
+                    <input type="radio" name="setupMode" value="learning" checked>
+                    <div class="mode-box">
+                      <div class="mode-icon-title">
+                        <div class="mode-badge lavender">Learning Mode</div>
+                        <h4 class="mode-title">Immediate Feedback & Explanations</h4>
+                      </div>
+                      <p class="mode-desc">Untimed, stress-free practice with instant explanations after every question to solidify concepts.</p>
+                      <ul class="mode-perks">
+                        <li>✦ Instant answer validation</li>
+                        <li>✦ Explanatory rationale included</li>
+                        <li>✦ Ideal for studying and revision</li>
+                      </ul>
+                    </div>
+                  </label>
+
+                  <label class="mode-card-option">
+                    <input type="radio" name="setupMode" value="exam">
+                    <div class="mode-box">
+                      <div class="mode-icon-title">
+                        <div class="mode-badge amber">Exam Mode</div>
+                        <h4 class="mode-title">Timed Assessment & Review</h4>
+                      </div>
+                      <p class="mode-desc">Simulates test conditions with an active countdown clock. Answers and detailed review are shown at the end.</p>
+                      <ul class="mode-perks">
+                        <li>✦ Real-time question timer</li>
+                        <li>✦ Strict final score tally</li>
+                        <li>✦ Full post-quiz review session</li>
+                      </ul>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <!-- 4. Number of Questions -->
+              <div class="form-group">
+                <label class="form-label" id="countLabel">4. Number of Questions</label>
+                <div class="count-pill-grid" role="radiogroup" aria-labelledby="countLabel">
+                  <label class="count-pill-option">
+                    <input type="radio" name="setupCount" value="5">
+                    <div class="count-pill-box">
+                      <span class="count-num">5 Questions</span>
+                      <span class="count-sub">Quick Practice</span>
+                    </div>
+                  </label>
+                  <label class="count-pill-option">
+                    <input type="radio" name="setupCount" value="10" checked>
+                    <div class="count-pill-box">
+                      <span class="count-num">10 Questions</span>
+                      <span class="count-sub">Standard Set</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Action Bar -->
+              <div class="setup-actions">
+                <button type="button" class="btn btn-secondary" id="setupCancelBtn">Cancel</button>
+                <button type="button" class="btn btn-primary btn-large" id="startQuizBtn">
+                  <span>Begin Quiz Now</span>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Setup Sidebar Summary -->
+          <aside class="setup-sidebar">
+            <div class="summary-card">
+              <h3 class="summary-title">Quiz Preview</h3>
+              <ul class="summary-list">
+                <li class="summary-item">
+                  <span class="item-label">Subject</span>
+                  <span class="item-value" id="summaryCategoryText">Technology</span>
+                </li>
+                <li class="summary-item">
+                  <span class="item-label">Difficulty</span>
+                  <span class="item-value" id="summaryDifficultyText">Easy</span>
+                </li>
+                <li class="summary-item">
+                  <span class="item-label">Mode</span>
+                  <span class="item-value" id="summaryModeText">Learning Mode</span>
+                </li>
+                <li class="summary-item">
+                  <span class="item-label">Questions</span>
+                  <span class="item-value" id="summaryCountText">10 Questions</span>
+                </li>
+                <li class="summary-item">
+                  <span class="item-label">Pacing</span>
+                  <span class="item-value" id="summaryPacingText">Self-paced</span>
+                </li>
+              </ul>
+              <div class="summary-tip">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                <p>Every session randomly shuffles options and question selection for fresh practice!</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SCREEN 6: ACTIVE QUIZ GAME                 -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewQuiz" aria-labelledby="quizCategoryTag">
+        <!-- Active Quiz Header -->
+        <div class="quiz-top-bar">
+          <div class="quiz-top-meta">
+            <span class="badge badge-subtle" id="quizCategoryTag">Technology</span>
+            <span class="badge badge-difficulty" id="quizDiffTag">Easy</span>
+            <span class="badge badge-mode" id="quizModeTag">Learning Mode</span>
+          </div>
+
+          <div class="quiz-top-actions">
+            <!-- Timer (active in Exam Mode) -->
+            <div class="timer-pill" id="quizTimerWrap" style="display: none;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <span id="quizTimerText">00:30</span>
+            </div>
+            <button type="button" class="btn-subtle" id="quitQuizBtn" aria-label="Exit or restart quiz">
+              <span>Exit Quiz</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div class="progress-container">
+          <div class="progress-meta">
+            <span class="progress-step-text" id="quizStepText">Question 1 of 10</span>
+            <span class="progress-percent-text" id="quizPercentText">10% Completed</span>
+          </div>
+          <div class="progress-track" role="progressbar" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-fill" id="quizProgressBar" style="width: 10%;"></div>
+          </div>
+        </div>
+
+        <!-- Question Board -->
+        <div class="question-container">
+          <div class="question-card" id="activeQuestionCard">
+            <div class="question-meta-row">
+              <span class="question-number-pill" id="questionNumBadge">Question 01</span>
+              <span class="question-points-pill">1 Point</span>
+            </div>
+
+            <h2 class="question-text" id="questionText">
+              Loading question...
+            </h2>
+
+            <!-- Options Grid -->
+            <div class="options-list" id="optionsContainer" role="radiogroup" aria-label="Quiz Answer Options">
+              <!-- Rendered via JS -->
+            </div>
+
+            <!-- Instant Feedback / Explanation Box (Learning Mode) -->
+            <div class="explanation-box" id="explanationBox" style="display: none;">
+              <div class="explanation-header">
+                <span class="explanation-badge" id="explanationBadge">Correct!</span>
+                <span class="explanation-title" id="explanationTitle">Concept Rationale</span>
+              </div>
+              <p class="explanation-content" id="explanationContent">
+                Detailed educational explanation will appear here.
+              </p>
+            </div>
+          </div>
+
+          <!-- Bottom Control Bar -->
+          <div class="quiz-footer">
+            <button type="button" class="btn btn-secondary" id="quizPrevBtn" style="visibility: hidden;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+              <span>Previous</span>
+            </button>
+
+            <div class="quiz-footer-hint" id="footerHint">
+              Select an option above to continue
+            </div>
+
+            <button type="button" class="btn btn-primary" id="quizNextBtn" disabled>
+              <span id="nextBtnText">Next Question</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true" focusable="false"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SCREEN 7: RESULTS                          -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewResults" aria-labelledby="resultsTitle">
+        <!-- Results Hero Scoreboard -->
+        <!-- Results Hero Scoreboard (Upgraded with 3D Mascot, Ring & Tiers) -->
+        <div class="results-hero-card" id="resultsHeroCard">
+          <!-- Top Badges & Personal Best Banner -->
+          <div class="results-badge-wrap">
+            <div class="results-personal-best-badge" id="resultsPersonalBestBadge" style="display: none;" role="status">
+              <span class="pb-star" aria-hidden="true">⭐</span>
+              <span>New Personal Best!</span>
+              <span class="pb-sparkle" aria-hidden="true">✨</span>
+            </div>
+
+            <div class="results-tier-badge" id="resultsTierBadge">
+              <span class="tier-icon" id="resultsTierIcon" aria-hidden="true">🏆</span>
+              <span class="tier-name" id="resultsTierName">Legendary Tier</span>
+            </div>
+          </div>
+
+          <!-- Quiz Metadata Context Chips -->
+          <div class="results-meta-chips" id="resultsMetaChips" aria-label="Quiz Metadata">
+            <span class="meta-chip" id="resultsMetaCategory">💻 Technology</span>
+            <span class="meta-chip" id="resultsMetaDifficulty">⚡ Easy</span>
+            <span class="meta-chip" id="resultsMetaMode">⏱️ Exam Mode</span>
+            <span class="meta-chip status-completed" id="resultsMetaStatus">✓ Completed</span>
+          </div>
+
+          <!-- 3D Mascot & Trophy Celebration Stage -->
+          <div class="results-3d-stage" id="results3dStage" aria-label="Celebration stage">
+            <!-- Floating 3D Sparkles and Stars -->
+            <div class="stage-floating-particles" aria-hidden="true">
+              <span class="particle particle-1">✨</span>
+              <span class="particle particle-2">⭐</span>
+              <span class="particle particle-3">🌟</span>
+              <span class="particle particle-4">⚡</span>
+              <span class="particle particle-5">✦</span>
+              <span class="particle particle-6">💫</span>
+            </div>
+
+            <!-- 3D Mascot Stage Pedestal -->
+            <div class="mascot-pedestal-3d" aria-hidden="true">
+              <div class="pedestal-ring-glow"></div>
+              <div class="pedestal-disc"></div>
+            </div>
+
+            <!-- Dynamic Mascot & 3D Illustration Container -->
+            <div class="mascot-character-wrap" id="resultsMascotContainer">
+              <!-- Rendered via JS renderMascotIllustration -->
+            </div>
+          </div>
+
+          <!-- Headline and Feedback Rationale -->
+          <h1 id="resultsTitle" class="results-title">Quiz Complete!</h1>
+          <p class="results-subtitle" id="resultsFeedbackMsg">
+            Impressive effort! You demonstrated strong foundational knowledge.
+          </p>
+
+          <!-- Circular / Numeric Score Highlight with 3D Animated Ring -->
+          <div class="score-display-card" id="resultsScoreDisplayCard">
+            <div class="score-ring-wrap" aria-label="Quiz accuracy score">
+              <svg class="score-ring-svg" viewBox="0 0 160 160" aria-hidden="true">
+                <defs>
+                  <linearGradient id="scoreRingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#f59e0b" class="ring-grad-start"/>
+                    <stop offset="100%" stop-color="#7c3aed" class="ring-grad-end"/>
+                  </linearGradient>
+                  <filter id="ringGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="3" result="blur"/>
+                    <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                  </filter>
+                </defs>
+                <circle class="score-ring-track" cx="80" cy="80" r="66"></circle>
+                <circle class="score-ring-progress" id="scoreRingProgress" cx="80" cy="80" r="66" stroke-dasharray="414.69" stroke-dashoffset="414.69"></circle>
+              </svg>
+              <div class="score-circle-inner">
+                <span class="score-num" id="scorePercentage">0%</span>
+                <span class="score-fraction" id="scoreFractionVal">0 of 0</span>
+                <span class="score-caption">Accuracy</span>
+              </div>
+            </div>
+
+            <div class="score-stats-grid">
+              <div class="score-stat-box stat-correct">
+                <div class="stat-box-header">
+                  <span class="stat-icon" aria-hidden="true">✓</span>
+                  <span class="score-stat-label">Correct</span>
+                </div>
+                <span class="score-stat-val correct-color" id="scoreCorrectVal">0</span>
+              </div>
+              <div class="score-stat-box stat-incorrect">
+                <div class="stat-box-header">
+                  <span class="stat-icon" aria-hidden="true">✕</span>
+                  <span class="score-stat-label">Incorrect</span>
+                </div>
+                <span class="score-stat-val incorrect-color" id="scoreIncorrectVal">0</span>
+              </div>
+              <div class="score-stat-box stat-unanswered">
+                <div class="stat-box-header">
+                  <span class="stat-icon" aria-hidden="true">?</span>
+                  <span class="score-stat-label">Unanswered</span>
+                </div>
+                <span class="score-stat-val unanswered-color" id="scoreUnansweredVal">0</span>
+              </div>
+              <div class="score-stat-box stat-time">
+                <div class="stat-box-header">
+                  <span class="stat-icon" aria-hidden="true">⏱️</span>
+                  <span class="score-stat-label">Time Spent</span>
+                </div>
+                <span class="score-stat-val" id="scoreTimeVal">00:00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- XP, Coins & Level Progression Card -->
+          <div class="results-progression-card" id="resultsProgressionCard">
+            <div class="rewards-summary-row">
+              <div class="results-coin-banner" id="resultsCoinReward">
+                <span class="reward-coin-spin" aria-hidden="true">🪙</span>
+                <span>+<span id="resultsCoinAmount">0</span> Coins</span>
+              </div>
+              <div class="results-xp-banner" id="resultsXpReward">
+                <span class="reward-xp-icon" aria-hidden="true">⚡</span>
+                <span>+<span id="resultsXpAmount">0</span> XP</span>
+              </div>
+            </div>
+
+            <!-- Level Up Progress Bar -->
+            <div class="results-level-track-wrap">
+              <div class="results-level-header">
+                <span class="results-level-title" id="resultsLevelTitle">Level 1 • Trivia Cadet</span>
+                <span class="results-level-xp-text" id="resultsLevelXpText">50 / 200 XP</span>
+              </div>
+              <div class="results-level-track" role="progressbar" aria-label="Level progression" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                <div class="results-level-fill" id="resultsLevelProgressFill" style="width: 25%;"></div>
+              </div>
+            </div>
+
+            <!-- Newly Unlocked Badges in this Attempt -->
+            <div class="results-unlocked-badges" id="resultsUnlockedBadges" style="display: none;">
+              <span class="unlocked-badges-headline">🏆 Achievement Unlocked!</span>
+              <div class="unlocked-badges-list" id="resultsNewBadgesList"></div>
+            </div>
+          </div>
+
+          <!-- Comprehensive Results Action Buttons (Desktop & Mobile) -->
+          <div class="results-actions" id="resultsActions">
+            <button type="button" class="btn btn-primary" id="retakeQuizBtn" aria-label="Play this quiz again">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg>
+              <span>Play Again</span>
+            </button>
+
+            <button type="button" class="btn btn-secondary" id="reviewAllBtn" aria-label="Review all questions and rationales">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              <span>Review All Questions</span>
+            </button>
+
+            <button type="button" class="btn btn-secondary" id="reviewMistakesBtn" aria-label="Review mistake questions only">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+              <span>Review Mistakes</span>
+            </button>
+
+            <button type="button" class="btn btn-secondary" id="newQuizFromResultsBtn" aria-label="Choose another category">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+              <span>Choose Another Category</span>
+            </button>
+
+            <button type="button" class="btn btn-secondary" id="tryAnotherChallengeBtn" aria-label="Try another challenge">
+              <span aria-hidden="true">⚡</span>
+              <span>Try Another Challenge</span>
+            </button>
+
+            <button type="button" class="btn btn-secondary" id="resultsHomeBtn" aria-label="Return to Home Dashboard">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+              <span>Return to Home</span>
+            </button>
+          </div>
+
+          <!-- Secondary Quick Link to Dedicated Review Screen -->
+          <div style="margin: 18px 0 0; text-align: center;">
+            <button type="button" class="btn btn-sparkle" id="openDedicatedReviewBtn">Open Dedicated Review Screen 🔍</button>
+          </div>
+        </div>
+
+        <!-- Detailed Answer Review Section -->
+        <div class="section-block review-section">
+          <div class="review-header">
+            <div>
+              <h2 class="review-title">Detailed Answer Review</h2>
+              <p class="review-subtitle">Review each question, your answer, and the pedagogical rationale behind each solution.</p>
+            </div>
+            <div class="review-filter-group">
+              <button type="button" class="review-filter-pill active" data-filter="all">All (<span id="reviewCountAll">0</span>)</button>
+              <button type="button" class="review-filter-pill" data-filter="incorrect">Mistakes (<span id="reviewCountMistakes">0</span>)</button>
+            </div>
+          </div>
+
+          <!-- Review List Container -->
+          <div class="review-list" id="reviewContainer">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SCREEN 8: REWARDS & ACHIEVEMENTS           -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewRewards" aria-labelledby="rewardsTitle">
+        <div class="view-header">
+          <div>
+            <h1 id="rewardsTitle" class="section-title">Rewards & Achievements</h1>
+            <p class="section-subtitle">Earn coins, maintain your daily streak, and unlock prestige badges as you master new subjects.</p>
+          </div>
+        </div>
+
+        <!-- Coins Hero Card -->
+        <div class="rewards-hero-card">
+          <div>
+            <span style="font-size: 0.9rem; font-weight: 800; text-transform: uppercase;">Coin Treasury</span>
+            <div class="rewards-hero-val"><span id="rewardsCoinsVal">150</span> 🪙</div>
+            <p style="margin-top: 6px; font-size: 0.88rem; opacity: 0.9;">Earn +20 coins per correct answer, +50 for match victories!</p>
+          </div>
+          <button type="button" class="btn btn-sparkle" id="claimBonusBtn">Daily Bonus ✨</button>
+        </div>
+
+        <!-- 7-Day Streak Tracker -->
+        <div class="streak-track-card">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary-dark);">7-Day Streak Journey</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">Play every day to compound your rewards and maintain your flame.</p>
+            </div>
+            <span class="streak-badge-pill">🔥 <span id="rewardsStreakDays">1</span> Days</span>
+          </div>
+
+          <div class="streak-days-row">
+            <div class="streak-day-item"><div class="streak-day-circle active">✓</div><span>Day 1</span></div>
+            <div class="streak-day-item"><div class="streak-day-circle">2</div><span>Day 2</span></div>
+            <div class="streak-day-item"><div class="streak-day-circle">3</div><span>Day 3</span></div>
+            <div class="streak-day-item"><div class="streak-day-circle">4</div><span>Day 4</span></div>
+            <div class="streak-day-item"><div class="streak-day-circle">5</div><span>Day 5</span></div>
+            <div class="streak-day-item"><div class="streak-day-circle">6</div><span>Day 6</span></div>
+            <div class="streak-day-item"><div class="streak-day-circle">7</div><span>Day 7</span></div>
+          </div>
+        </div>
+
+        <!-- Badges Grid -->
+        <div class="section-block prestige-gallery-section">
+          <div class="badges-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <h2 style="font-size: 1.3rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 4px;">Prestige Badges Gallery</h2>
+              <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0;">Tap any achievement to inspect requirements, unlock tips, and measurable progress.</p>
+            </div>
+            <div class="badges-unlocked-counter-badge" id="badgesUnlockedCounter" style="background: rgba(124, 58, 237, 0.12); border: 1.5px solid var(--primary); color: var(--primary); font-weight: 800; padding: 6px 14px; border-radius: var(--radius-full); font-size: 0.84rem;">
+              <span id="badgesUnlockedCount">1</span> of <span id="badgesTotalCount">8</span> Unlocked 🏆
+            </div>
+          </div>
+          <div class="badges-grid" id="badgesGrid" role="list" aria-label="Prestige Badges Achievement Gallery">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SCREEN 9: PROFILE & PLAYER DASHBOARD       -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewProfile" aria-labelledby="profileTitle">
+        <div class="view-header">
+          <div>
+            <h1 id="profileTitle" class="section-title">Player Profile Dashboard 👤</h1>
+            <p class="section-subtitle">Manage your personal persona, track career statistics, and customize your app preferences.</p>
+          </div>
+        </div>
+
+        <!-- 1. Hero Player Card -->
+        <div class="profile-hero-card">
+          <div class="profile-avatar-column">
+            <div class="profile-avatar-big" id="profileAvatarBig" title="Your Profile Picture / Avatar">
+              <span id="profileAvatarEmoji">🦊</span>
+              <img id="profileAvatarImg" alt="Custom profile picture" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+            </div>
+            <!-- Gallery Upload Controls -->
+            <input type="file" id="profilePhotoInput" accept="image/jpeg,image/png,image/webp" style="display: none;">
+            <div class="profile-photo-actions">
+              <button type="button" class="btn btn-secondary btn-sm" id="choosePhotoBtn" title="Upload custom photo from your device">
+                <span>🖼️ Choose from Gallery</span>
+              </button>
+              <button type="button" class="btn btn-text-subtle btn-sm" id="removePhotoBtn" style="display: none; color: #dc2626;" title="Remove uploaded photo and restore emoji">
+                <span>Remove Photo</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="profile-details-column">
+            <div class="profile-name-edit-row">
+              <input type="text" id="profileNameInput" value="QuizMaster" maxlength="24" aria-label="Player display name">
+              <button type="button" class="btn btn-secondary" id="saveProfileNameBtn">Save Name</button>
+            </div>
+
+            <!-- Level & XP Progress Bar -->
+            <div class="profile-xp-box">
+              <div class="profile-xp-header">
+                <span id="profileLevelBadge" class="profile-tier-pill">Level 1 • Trivia Cadet</span>
+                <span class="profile-xp-numbers"><span id="profileXpText">50</span> / 200 XP</span>
+              </div>
+              <div class="profile-xp-track">
+                <div id="profileXpFill" class="profile-xp-bar-fill" style="width: 25%;"></div>
+              </div>
+            </div>
+
+            <!-- Quick Action Links -->
+            <div class="profile-quick-actions">
+              <button type="button" class="btn btn-secondary btn-sm" id="profileOpenSettingsBtn">⚙️ Settings & Preferences</button>
+              <button type="button" class="btn btn-secondary btn-sm" id="openAvatarStudioBtn">🎨 Avatar Studio</button>
+              <button type="button" class="btn btn-secondary btn-sm" id="openThemeStudioBtn">🌈 Theme Studio</button>
+            </div>
+
+            <!-- Quick Avatar Emoji Selector -->
+            <div class="avatar-picker-section">
+              <span class="avatar-picker-label">Or choose an avatar preset:</span>
+              <div class="avatar-picker-grid" id="avatarPickerGrid">
+                <!-- Rendered via JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Career Statistics Grid -->
+        <div class="score-stats-grid" style="margin-bottom: 24px;">
+          <div class="score-stat-box">
+            <span class="score-stat-val" id="profileStatQuizzes">0</span>
+            <span class="score-stat-label">Quizzes Played</span>
+          </div>
+          <div class="score-stat-box">
+            <span class="score-stat-val" id="profileStatAccuracy">0%</span>
+            <span class="score-stat-label">Career Accuracy</span>
+          </div>
+          <div class="score-stat-box">
+            <span class="score-stat-val" id="profileStatCoins">150</span>
+            <span class="score-stat-label">Coins Treasury</span>
+          </div>
+          <div class="score-stat-box">
+            <span class="score-stat-val" id="profileStatStreak">1</span>
+            <span class="score-stat-label">Current Streak</span>
+          </div>
+        </div>
+
+        <!-- 3. Discipline Mastery Breakdown -->
+        <div class="panel-card" style="padding: 24px; margin-bottom: 24px;">
+          <div class="panel-header" style="margin-bottom: 16px;">
+            <div class="panel-title-wrap">
+              <span class="panel-icon lavender">📊</span>
+              <h3 class="panel-title">Discipline Mastery Breakdown</h3>
+            </div>
+            <span class="panel-badge">Based on Local Attempts</span>
+          </div>
+          <div class="discipline-mastery-list" id="profileMasteryContainer">
+            <!-- Rendered dynamically via renderProfileMastery() -->
+          </div>
+        </div>
+
+        <!-- 4. Recent Attempts History -->
+        <div class="panel-card" style="padding: 24px; margin-bottom: 24px;">
+          <div class="panel-header" style="margin-bottom: 16px;">
+            <div class="panel-title-wrap">
+              <span class="panel-icon emerald">⏱️</span>
+              <h3 class="panel-title">Recent Quiz Sessions</h3>
+            </div>
+            <button type="button" class="btn-text-subtle" id="profileClearHistoryBtn">Clear History</button>
+          </div>
+          <div class="profile-recent-attempts" id="profileRecentAttemptsContainer">
+            <!-- Rendered dynamically via renderProfileRecentAttempts() -->
+          </div>
+        </div>
+
+        <!-- 5. Prestige Achievements Overview -->
+        <div class="panel-card" style="padding: 24px; margin-bottom: 24px;">
+          <div class="panel-header" style="margin-bottom: 16px;">
+            <div class="panel-title-wrap">
+              <span class="panel-icon amber">🏆</span>
+              <h3 class="panel-title">Prestige Badges Showcase</h3>
+            </div>
+            <span class="badge badge-accent" id="profileBadgeCounter">1 / 8 Unlocked</span>
+          </div>
+          <div class="profile-badges-mini-grid" id="profileBadgesMiniGrid">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <!-- 6. In-Profile Settings Card -->
+        <div class="panel-card" id="profileSettingsCard" style="padding: 24px; margin-bottom: 24px; border: 1.5px solid var(--primary-border); background: var(--primary-surface);">
+          <div class="panel-header" style="margin-bottom: 16px;">
+            <div class="panel-title-wrap">
+              <span class="panel-icon lavender">⚙️</span>
+              <h3 class="panel-title">Quick Settings & App Controls</h3>
+            </div>
+            <button type="button" class="btn btn-secondary" id="openFullSettingsBtn">Full Settings ➔</button>
+          </div>
+          <div class="profile-settings-quick-grid">
+            <div class="quick-setting-item">
+              <div>
+                <strong>Sound Effects</strong>
+                <p>Web Audio answer chimes</p>
+              </div>
+              <input type="checkbox" id="profileSoundToggle" checked style="width: 20px; height: 20px; cursor: pointer;">
+            </div>
+            <div class="quick-setting-item">
+              <div>
+                <strong>Midnight Galaxy Dark Theme</strong>
+                <p>High-contrast deep purple mode</p>
+              </div>
+              <input type="checkbox" id="profileThemeToggle" style="width: 20px; height: 20px; cursor: pointer;">
+            </div>
+            <div class="quick-setting-item">
+              <div>
+                <strong>Reduced Motion</strong>
+                <p>Suppress micro-animations</p>
+              </div>
+              <input type="checkbox" id="profileReducedMotionToggle" style="width: 20px; height: 20px; cursor: pointer;">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SCREEN 10: MULTIPLAYER DEMO ROOM           -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewMultiplayer" aria-labelledby="multiTitle">
+        <div class="view-header">
+          <button type="button" class="btn-back" id="multiBackBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            <span>Back to Play</span>
+          </button>
+          <div>
+            <h1 id="multiTitle" class="section-title">Multiplayer Arena (Demo Room)</h1>
+            <p class="section-subtitle">Host or join simulated rooms. Fully client-side demonstration of party lobbies.</p>
+          </div>
+        </div>
+
+        <div class="demo-disclaimer-card" role="note">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <div>
+            <strong>Client-Side Demo:</strong> Real-time cross-device sync requires an online WebSocket server. This demo room demonstrates the interactive UX of room code generation and lobby coordination.
+          </div>
+        </div>
+
+        <div class="multiplayer-grid">
+          <!-- Host Room Card -->
+          <div class="multi-panel-card">
+            <h3>Host Private Room</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 4px;">Share this room code with friends to coordinate quiz sessions.</p>
+
+            <div class="room-code-display">
+              <span class="room-code-text" id="demoRoomCode">QZ-8842</span>
+              <button type="button" class="btn btn-secondary" id="copyRoomCodeBtn">Copy Code</button>
+            </div>
+
+            <h4>Players in Lobby (2/4)</h4>
+            <div class="lobby-players-list">
+              <div class="lobby-player-row"><span>🦊 You (Host)</span><span class="badge badge-accent">Ready</span></div>
+              <div class="lobby-player-row"><span>🤖 Bot Buddy (Simulated)</span><span class="badge badge-subtle">Ready</span></div>
+            </div>
+
+            <button type="button" class="btn btn-primary btn-full" id="startDemoMultiMatchBtn">Start Party Quiz Demo</button>
+          </div>
+
+          <!-- Join Room Card -->
+          <div class="multi-panel-card">
+            <h3>Join Existing Room</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 4px;">Enter a 6-digit room code to jump into a lobby.</p>
+
+            <div style="margin: 20px 0;">
+              <input type="text" id="joinRoomInput" placeholder="Enter code (e.g. QZ-8842)" style="width: 100%; padding: 14px 18px; border-radius: var(--radius-md); border: 1.5px solid var(--border-light); font-size: 1.1rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;">
+            </div>
+
+            <button type="button" class="btn btn-secondary btn-full" id="joinRoomBtn">Connect to Room</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SCREEN 11: SETTINGS & PREFERENCES          -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewSettings" aria-labelledby="settingsTitle">
+        <div class="view-header" style="align-items: flex-start;">
+          <button type="button" class="btn-back" id="settingsBackToProfileBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            <span>Back to Profile</span>
+          </button>
+          <div>
+            <h1 id="settingsTitle" class="section-title">Settings & Preferences ⚙️</h1>
+            <p class="section-subtitle">Manage audio chimes, theme appearance, and local progress storage.</p>
+          </div>
+        </div>
+
+        <div class="panel-card" style="max-width: 640px; margin: 0 auto; padding: 24px;">
+          <!-- Sound Toggle -->
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border-light);">
+            <div>
+              <h4 style="font-size: 1.05rem; font-weight: 800;">Sound Effects & Chimes</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">Web Audio API synthesized chimes for correct and wrong answers.</p>
+            </div>
+            <label style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" id="settingsSoundToggle" checked style="width: 20px; height: 20px;">
+              <span style="font-weight: 700;">Enabled</span>
+            </label>
+          </div>
+
+          
+          <!-- Theme Studio Link -->
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border-light);">
+            <div>
+              <h4 style="font-size: 1.05rem; font-weight: 800;">Theme Studio</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">Choose from 8 curated themes including Neon Arcade, Ocean Glow, and Sunset Pop.</p>
+            </div>
+            <button type="button" class="btn btn-secondary" id="settingsOpenThemesBtn">Select Theme 🌈</button>
+          </div>
+
+          <!-- Font Settings Link -->
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border-light);">
+            <div>
+              <h4 style="font-size: 1.05rem; font-weight: 800;">Font & Typography</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">Customize typeface (Plus Jakarta, Outfit, Poppins, Inter, Lexend) and scaling.</p>
+            </div>
+            <button type="button" class="btn btn-secondary" id="settingsOpenFontsBtn">Font Settings 🔠</button>
+          </div>
+
+          <!-- Reduced Motion Toggle -->
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border-light);">
+            <div>
+              <h4 style="font-size: 1.05rem; font-weight: 800;">Reduced Motion</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">Minimize non-essential UI animations for improved performance.</p>
+            </div>
+            <label style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" id="settingsReducedMotionToggle" style="width: 20px; height: 20px;">
+              <span style="font-weight: 700;">Reduced</span>
+            </label>
+          </div>
+
+          <!-- Theme Toggle -->
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border-light);">
+            <div>
+              <h4 style="font-size: 1.05rem; font-weight: 800;">Midnight Dark Theme</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">Deep violet midnight mode for nighttime learning.</p>
+            </div>
+            <label style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" id="settingsThemeToggle" style="width: 20px; height: 20px;">
+              <span style="font-weight: 700;">Dark</span>
+            </label>
+          </div>
+
+          <!-- Reset Progress -->
+          <div style="padding: 20px 0;">
+            <h4 style="font-size: 1.05rem; font-weight: 800; color: #dc2626;">Reset Career Progress</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Clears all saved attempts, best scores, coins, and resets the profile locally.</p>
+            <button type="button" class="btn btn-secondary" id="openResetModalBtn" style="color: #dc2626; border-color: #fecdd3;">Reset All Data</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SCREEN 12: WELCOME / ONBOARDING            -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewOnboarding" aria-labelledby="onboardingTitle">
+        <div style="max-width: 620px; margin: 0 auto; text-align: center; padding: 32px 20px;">
+          <span style="font-size: 2.8rem;">🎉</span>
+          <h1 id="onboardingTitle" style="font-size: 2.2rem; font-weight: 800; color: var(--primary-dark); margin: 12px 0;">Welcome to QuizUp!</h1>
+          <p style="font-size: 1.05rem; color: var(--text-body); line-height: 1.6; margin-bottom: 32px;">The complete quiz gaming platform for curious learners, students, and competitive gamers.</p>
+
+          <div style="display: flex; flex-direction: column; gap: 16px; text-align: left; margin-bottom: 32px;">
+            <div class="panel-card" style="padding: 18px 20px; display: flex; align-items: center; gap: 16px;">
+              <span style="font-size: 2rem;">📚</span>
+              <div>
+                <h4 style="font-size: 1.05rem; font-weight: 800;">270 Curated Questions</h4>
+                <p style="font-size: 0.86rem; color: var(--text-muted);">Explore Technology, Academics, General Knowledge, Competitive Exams, Sports, and Entertainment.</p>
+              </div>
+            </div>
+
+            <div class="panel-card" style="padding: 18px 20px; display: flex; align-items: center; gap: 16px;">
+              <span style="font-size: 2rem;">🤖</span>
+              <div>
+                <h4 style="font-size: 1.05rem; font-weight: 800;">Battle the Bot or Friends</h4>
+                <p style="font-size: 0.86rem; color: var(--text-muted);">Challenge ByteBot AI with live head-to-head score tracking, or pass & play with a friend on one phone.</p>
+              </div>
+            </div>
+
+            <div class="panel-card" style="padding: 18px 20px; display: flex; align-items: center; gap: 16px;">
+              <span style="font-size: 2rem;">🏆</span>
+              <div>
+                <h4 style="font-size: 1.05rem; font-weight: 800;">Climb Leaderboards & Earn Coins</h4>
+                <p style="font-size: 0.86rem; color: var(--text-muted);">Collect coins, maintain your flame streak, unlock badges, and claim your place on the podium.</p>
+              </div>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-primary" id="onboardingStartBtn" style="padding: 14px 36px; font-size: 1.1rem;">Get Started & Play 🚀</button>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SCREEN 13: DAILY CHALLENGE                 -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewDailyChallenge" aria-labelledby="dailyChallengeTitle">
+        <div style="max-width: 640px; margin: 0 auto; text-align: center; padding: 24px 16px;">
+          <span style="font-size: 3rem;">⚡</span>
+          <h1 id="dailyChallengeTitle" style="font-size: 2rem; font-weight: 800; color: var(--primary-dark); margin: 10px 0;">Daily Spark Challenge</h1>
+          <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 24px;" id="dailyChallengeDateText">Today's Curated 5-Question Sprint</p>
+
+          <div class="rewards-hero-card" style="margin-bottom: 24px; text-align: left;">
+            <div>
+              <span class="badge" style="background: rgba(255,255,255,0.25); color: #78350f;">2X COIN MULTIPLIER</span>
+              <h3 style="font-size: 1.4rem; font-weight: 800; margin-top: 8px;">Earn +40 Coins Per Correct Answer</h3>
+              <p style="font-size: 0.88rem; opacity: 0.95; margin-top: 4px;">Completing today's challenge also extends your streak by +1 day!</p>
+            </div>
+            <span style="font-size: 3rem;">🪙</span>
+          </div>
+
+          <button type="button" class="btn btn-primary" id="startDailyChallengeBtn" style="padding: 14px 32px; font-size: 1.05rem;">Start Today's Spark ⚡</button>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SCREEN 14: QUIZ REVIEW (Dedicated Screen)  -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewReview" aria-labelledby="reviewScreenTitle">
+        <div class="view-header" style="align-items: flex-start;">
+          <button type="button" class="btn-back" id="reviewBackToResultsBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            <span>Back to Results</span>
+          </button>
+          <div>
+            <h1 id="reviewScreenTitle" class="section-title">Quiz Answer Review</h1>
+            <p class="section-subtitle">Examine your performance, study correct answers, and understand key concepts.</p>
+          </div>
+        </div>
+
+        <!-- Filter toggle buttons -->
+        <div class="filter-chips-row" style="display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap;">
+          <button type="button" class="btn btn-secondary active-chip" id="dedicatedReviewFilterAllBtn">All Questions (<span id="dedicatedReviewCountAll">0</span>)</button>
+          <button type="button" class="btn btn-secondary" id="dedicatedReviewFilterMistakesBtn">Incorrect Only (<span id="dedicatedReviewCountMistakes">0</span>)</button>
+        </div>
+
+        <!-- Review Question Cards List -->
+        <div class="review-cards-list" id="dedicatedReviewCardsList" role="list">
+          <!-- Rendered dynamically via JS -->
+        </div>
+
+        <!-- Bottom Actions -->
+        <div style="display: flex; gap: 12px; margin-top: 32px; justify-content: center; flex-wrap: wrap;">
+          <button type="button" class="btn btn-secondary" id="dedicatedReviewHomeBtn">Return to Dashboard</button>
+          <button type="button" class="btn btn-primary" id="dedicatedReviewRetryBtn">Retake Quiz</button>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SCREEN 15: COMPUTER MATCH ARENA            -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewComputerMatch" aria-labelledby="compMatchTitle">
+        <div class="arena-wrapper">
+          <div class="arena-vs-card">
+            <div class="arena-player">
+              <div class="arena-avatar"><span id="compPlayerAvatar">🦊</span></div>
+              <span class="arena-name" id="compPlayerName">You</span>
+              <span class="arena-score-badge" id="compPlayerLiveScore">0</span>
+            </div>
+
+            <div class="arena-vs-badge">VS</div>
+
+            <div class="arena-player">
+              <div class="arena-avatar bot"><span id="compBotAvatar">🤖</span></div>
+              <span class="arena-name" id="compBotName">ByteBot</span>
+              <span class="arena-score-badge bot-score" id="compBotLiveScore">0</span>
+            </div>
+          </div>
+
+          <!-- Strategy & Status Notice -->
+          <div class="bot-strategy-banner" id="botStrategyBanner">
+            <span>💡</span>
+            <div><strong>Bot Strategy:</strong> ByteBot uses probability-driven accuracy (~75%) with 3–5 second human-like thought latency.</div>
+          </div>
+
+          <!-- Question Arena Card -->
+          <div class="question-card" id="botQuestionCard">
+            <div class="question-top-bar">
+              <span class="badge badge-accent" id="botCategoryBadge">Technology</span>
+              <span class="quiz-step-text" id="botQuestionCounter">Question 1 of 5</span>
+            </div>
+            <h2 class="question-text" id="botQuestionText">Question text loading...</h2>
+
+            <div class="options-list" id="botOptionsContainer">
+              <!-- Options rendered via JS -->
+            </div>
+
+            <div class="bot-thinking-pill" id="botThinkingPill">
+              <div class="bot-dot-pulse"></div>
+              <span id="botThinkingText">ByteBot is analyzing options...</span>
+            </div>
+          </div>
+
+          <!-- Post-Match Result Overlay (Shown at end) -->
+          <div class="panel-card" id="botMatchResultCard" style="display: none; text-align: center; padding: 32px 20px; margin-top: 20px;">
+            <div id="botResultCrown" style="font-size: 3rem;">🏆</div>
+            <h2 id="botResultTitle" style="font-size: 1.8rem; font-weight: 800; color: var(--primary-dark); margin: 8px 0;">Victory!</h2>
+            <p id="botResultDesc" style="font-size: 0.95rem; color: var(--text-body); margin-bottom: 20px;">You defeated ByteBot and earned +50 Coins!</p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+              <button type="button" class="btn btn-secondary" id="botRematchBtn">Play Again</button>
+              <button type="button" class="btn btn-primary" id="botReturnPlayBtn">Return to Arena</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SCREEN 16: FRIEND MATCH (Pass & Play)      -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewFriendMatch" aria-labelledby="friendMatchTitle">
+        <div class="arena-wrapper">
+          <div class="arena-vs-card">
+            <div class="arena-player">
+              <div class="arena-avatar"><span>🦊</span></div>
+              <span class="arena-name" id="friendP1Name">Player 1</span>
+              <span class="arena-score-badge" id="friendP1LiveScore">0</span>
+            </div>
+
+            <div class="arena-vs-badge">VS</div>
+
+            <div class="arena-player">
+              <div class="arena-avatar" style="border-color: var(--friend-green);"><span>🦉</span></div>
+              <span class="arena-name" id="friendP2Name">Player 2</span>
+              <span class="arena-score-badge" style="color: var(--friend-green);" id="friendP2LiveScore">0</span>
+            </div>
+          </div>
+
+          <!-- Turn Banner -->
+          <div class="turn-banner-card" id="friendTurnBanner">
+            Round 1: Player 1's Turn 🎯
+          </div>
+
+          <!-- Handover Device Card (Shown between turns) -->
+          <div class="handover-card" id="friendHandoverCard" style="display: none;">
+            <div class="handover-icon">📱</div>
+            <h3 id="handoverTargetName" style="font-size: 1.4rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 8px;">Hand Phone to Player 2!</h3>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px;">Player 1 has locked their answer. It's now Player 2's turn to answer the same question!</p>
+            <button type="button" class="btn btn-primary" id="friendReadyNextPlayerBtn">I am Ready to Answer →</button>
+          </div>
+
+          <!-- Question Card for Friend Match -->
+          <div class="question-card" id="friendQuestionCard">
+            <div class="question-top-bar">
+              <span class="badge badge-accent" id="friendCategoryBadge">General Knowledge</span>
+              <span class="quiz-step-text" id="friendQuestionCounter">Question 1 of 5</span>
+            </div>
+            <h2 class="question-text" id="friendQuestionText">Question text loading...</h2>
+
+            <div class="options-list" id="friendOptionsContainer">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Final Winner Card -->
+          <div class="panel-card" id="friendWinnerCard" style="display: none; text-align: center; padding: 32px 20px; margin-top: 20px;">
+            <div style="font-size: 3.2rem;">👑</div>
+            <h2 id="friendWinnerText" style="font-size: 1.8rem; font-weight: 800; color: var(--primary-dark); margin: 8px 0;">Player 1 Wins!</h2>
+            <p id="friendWinnerDesc" style="font-size: 0.95rem; color: var(--text-body); margin-bottom: 20px;">Final Score: 4 - 3. Great match between both players!</p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+              <button type="button" class="btn btn-secondary" id="friendRematchBtn">Rematch</button>
+              <button type="button" class="btn btn-primary" id="friendReturnPlayBtn">Return to Play</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    
+      <!-- ========================================== -->
+      <!-- SCREEN: THEME STUDIO (8 Complete Themes)   -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewThemeStudio" aria-labelledby="themeStudioTitle">
+        <div class="view-header" style="align-items: flex-start;">
+          <button type="button" class="btn-back" id="themeStudioBackBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            <span>Back</span>
+          </button>
+          <div>
+            <h1 id="themeStudioTitle" class="section-title">Theme Studio</h1>
+            <p class="section-subtitle">Customize QuizUp's visual mood. Each theme adjusts backgrounds, cards, typography, and contrast.</p>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+          <button type="button" class="btn btn-secondary" id="resetThemeDefaultBtn">Reset to Default</button>
+        </div>
+
+        <div class="theme-grid" id="themeCardsGrid">
+          <!-- Rendered via JS for all 8 themes -->
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SCREEN: FONT & DISPLAY SETTINGS            -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewFontSettings" aria-labelledby="fontSettingsTitle">
+        <div class="view-header" style="align-items: flex-start;">
+          <button type="button" class="btn-back" id="fontSettingsBackBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            <span>Back</span>
+          </button>
+          <div>
+            <h1 id="fontSettingsTitle" class="section-title">Font & Typography Settings</h1>
+            <p class="section-subtitle">Select your preferred typeface and scale for optimal legibility.</p>
+          </div>
+        </div>
+
+        <div class="panel-card" style="max-width: 640px; margin: 0 auto; padding: 24px;">
+          <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--text-primary); margin-bottom: 12px;">Typeface Choice</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin-bottom: 24px;" id="fontChoiceGrid">
+            <button type="button" class="btn btn-secondary active-chip" data-font="plus-jakarta" style="font-family: 'Plus Jakarta Sans', sans-serif;">Plus Jakarta Sans</button>
+            <button type="button" class="btn btn-secondary" data-font="outfit" style="font-family: 'Outfit', sans-serif;">Outfit Rounded</button>
+            <button type="button" class="btn btn-secondary" data-font="poppins" style="font-family: 'Poppins', sans-serif;">Poppins Geometric</button>
+            <button type="button" class="btn btn-secondary" data-font="inter" style="font-family: 'Inter', sans-serif;">Inter Clean</button>
+            <button type="button" class="btn btn-secondary" data-font="lexend" style="font-family: 'Lexend', sans-serif;">Lexend Readable</button>
+          </div>
+
+          <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--text-primary); margin-bottom: 12px;">Font Size Scaling</h3>
+          <div style="display: flex; gap: 10px; margin-bottom: 24px;" id="fontSizeChoiceGroup">
+            <button type="button" class="btn btn-secondary" data-size="small">Small (14.5px)</button>
+            <button type="button" class="btn btn-secondary active-chip" data-size="medium">Medium (16px)</button>
+            <button type="button" class="btn btn-secondary" data-size="large">Large (17.5px)</button>
+          </div>
+
+          <!-- Live Typography Preview Card -->
+          <div class="panel-card" style="background: var(--bg-subtle); padding: 18px; border-radius: var(--radius-md); margin-bottom: 20px;">
+            <span class="badge badge-accent">Sample Quiz Question</span>
+            <h4 style="font-size: 1.15rem; font-weight: 800; margin: 8px 0; color: var(--text-primary);">What is the speed of light in vacuum?</h4>
+            <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.5;">Approximately 299,792,458 meters per second. This sample text reflects your chosen typeface and size scaling.</p>
+          </div>
+
+          <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button type="button" class="btn btn-secondary" id="resetFontBtn">Reset to Default</button>
+            <button type="button" class="btn btn-primary" id="saveFontBtn">Apply & Save Preferences</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SCREEN: AVATAR STUDIO                      -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewAvatarStudio" aria-labelledby="avatarStudioTitle">
+        <div class="view-header" style="align-items: flex-start;">
+          <button type="button" class="btn-back" id="avatarStudioBackBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            <span>Back to Profile</span>
+          </button>
+          <div>
+            <h1 id="avatarStudioTitle" class="section-title">Avatar Studio 🎨</h1>
+            <p class="section-subtitle">Customize your player persona with unlockable cosmetic items, auras, and character presets.</p>
+          </div>
+        </div>
+
+        <div class="avatar-studio-container">
+          <!-- Live Preview Column -->
+          <div class="avatar-preview-stage">
+            <div class="avatar-canvas-wrap" id="studioAvatarCanvas">
+              <span id="studioAvatarChar">🦊</span>
+              <span class="accessory-badge-overlay" id="studioAccessoryOverlay"></span>
+            </div>
+            <div style="margin-bottom: 12px; width: 100%;">
+              <input type="text" id="studioNameInput" value="QuizMaster" style="text-align: center; font-size: 1.2rem; font-weight: 800; padding: 6px 10px; border-radius: var(--radius-md); border: 1.5px solid var(--border-light); width: 100%;">
+            </div>
+            <div style="display: flex; gap: 8px; width: 100%;">
+              <button type="button" class="btn btn-secondary" id="randomizeAvatarBtn" style="flex: 1; padding: 8px;">Randomize 🎲</button>
+            </div>
+            <div style="margin-top: 16px; font-size: 0.9rem; font-weight: 800; color: var(--accent-orange);">
+              <span>Treasury: </span><span id="studioCoinCount">150</span> 🪙
+            </div>
+          </div>
+
+          <!-- Customization Tabs / Shelves -->
+          <div>
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--text-primary); margin-bottom: 10px;">1. Choose Base Character</h3>
+            <div class="avatar-picker-grid" id="studioBasePickerGrid" style="margin-bottom: 20px;">
+              <!-- 12 Base Avatars via JS -->
+            </div>
+
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--text-primary); margin-bottom: 10px;">2. Cosmetic Accessories (Unlock with Coins)</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Earn coins by answering questions correctly, then equip these premium accessories.</p>
+            <div class="accessories-shelf" id="studioAccessoriesShelf">
+              <!-- Rendered via JS -->
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+              <button type="button" class="btn btn-secondary" id="cancelAvatarStudioBtn">Cancel</button>
+              <button type="button" class="btn btn-primary" id="saveAvatarStudioBtn">Save Persona ✓</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SCREEN: SPEED SPRINT CHALLENGE             -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewSpeedChallenge" aria-labelledby="speedChallengeTitle">
+        <div class="view-header" style="align-items: flex-start;">
+          <button type="button" class="btn-back" id="speedBackBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            <span>Exit Speed Sprint</span>
+          </button>
+          <div>
+            <h1 id="speedChallengeTitle" class="section-title">Speed Sprint ⚡</h1>
+            <p class="section-subtitle">10 seconds per question! Quick instincts earn maximum coins.</p>
+          </div>
+        </div>
+
+        <div class="puzzle-arena-card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="badge badge-accent" id="speedCategoryTag">Technology</span>
+            <span style="font-weight: 800; color: var(--accent-orange); font-size: 1.1rem;" id="speedTimeLeft">10s</span>
+          </div>
+
+          <div class="speed-timer-bar">
+            <div class="speed-timer-fill" id="speedTimerFill"></div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; font-size: 0.88rem; color: var(--text-muted); margin-bottom: 10px;">
+            <span id="speedProgressText">Question 1 of 5</span>
+            <span>Score: <span id="speedLiveScore">0</span></span>
+          </div>
+
+          <h2 class="question-text" id="speedQuestionText">Question text loading...</h2>
+          <div class="options-list" id="speedOptionsContainer"></div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SCREEN: TRUE OR FALSE RAPID FIRE           -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewTrueFalse" aria-labelledby="tfTitle">
+        <div class="view-header" style="align-items: flex-start;">
+          <button type="button" class="btn-back" id="tfBackBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            <span>Exit True/False</span>
+          </button>
+          <div>
+            <h1 id="tfTitle" class="section-title">True or False ⚖️</h1>
+            <p class="section-subtitle">Determine if the statement is fact or fiction. Rapid evaluation rounds.</p>
+          </div>
+        </div>
+
+        <div class="puzzle-arena-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <span class="badge badge-accent" id="tfCategoryTag">General Knowledge</span>
+            <span>Score: <span id="tfLiveScore" style="font-weight: 800; color: var(--primary);">0</span></span>
+          </div>
+
+          <span id="tfProgressText" style="font-size: 0.88rem; color: var(--text-muted);">Statement 1 of 5</span>
+          <h2 class="question-text" id="tfStatementText" style="margin: 14px 0 24px; min-height: 80px;">Loading statement...</h2>
+
+          <div class="tf-buttons-row">
+            <button type="button" class="tf-btn tf-btn-true" id="tfTrueBtn">
+              <span>✓</span>
+              <span>TRUE</span>
+            </button>
+            <button type="button" class="tf-btn tf-btn-false" id="tfFalseBtn">
+              <span>✗</span>
+              <span>FALSE</span>
+            </button>
+          </div>
+          <div id="tfFeedbackBox" style="margin-top: 18px; padding: 12px; border-radius: var(--radius-md); display: none;"></div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SCREEN: WORD PUZZLE (ANAGRAM UNSCRAMBLE)   -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewWordPuzzle" aria-labelledby="wordPuzzleTitle">
+        <div class="view-header" style="align-items: flex-start;">
+          <button type="button" class="btn-back" id="wordBackBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            <span>Exit Word Puzzle</span>
+          </button>
+          <div>
+            <h1 id="wordPuzzleTitle" class="section-title">Word Puzzle Challenge 🔤</h1>
+            <p class="section-subtitle">Unscramble the letters to discover key terminology from science, tech, and history.</p>
+          </div>
+        </div>
+
+        <div class="puzzle-arena-card">
+          <div class="word-puzzle-clue" id="wordPuzzleClue">
+            <strong>Clue:</strong> High-level programming language named after a famous British comedy group.
+          </div>
+
+          <div class="word-answer-slots" id="wordAnswerSlots">
+            <!-- Rendered via JS -->
+          </div>
+
+          <div class="scrambled-letters-row" id="scrambledLettersRow">
+            <!-- Letter buttons rendered via JS -->
+          </div>
+
+          <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+            <button type="button" class="btn btn-secondary" id="clearWordBtn">Clear Letters</button>
+            <button type="button" class="btn btn-primary" id="submitWordBtn">Check Word ✓</button>
+          </div>
+          <div id="wordFeedbackBox" style="margin-top: 16px; text-align: center; font-weight: 800; display: none;"></div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SCREEN: MEMORY MATCH CHALLENGE             -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewMemoryMatch" aria-labelledby="memoryTitle">
+        <div class="view-header" style="align-items: flex-start;">
+          <button type="button" class="btn-back" id="memoryBackBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            <span>Exit Memory Match</span>
+          </button>
+          <div>
+            <h1 id="memoryTitle" class="section-title">Memory Match 🧠</h1>
+            <p class="section-subtitle">Flip cards to match disciplinary symbols and test your visual recall.</p>
+          </div>
+        </div>
+
+        <div class="puzzle-arena-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <span>Moves: <strong id="memoryMoveCount">0</strong></span>
+            <span>Pairs Found: <strong id="memoryPairsFound">0 / 6</strong></span>
+            <button type="button" class="btn btn-secondary" id="restartMemoryBtn" style="padding: 4px 12px; font-size: 0.85rem;">Restart</button>
+          </div>
+
+          <div class="memory-grid" id="memoryCardGrid">
+            <!-- 12 cards rendered via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SCREEN: SURVIVAL MODE (3 HEARTS)           -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewSurvival" aria-labelledby="survivalTitle">
+        <div class="view-header" style="align-items: flex-start;">
+          <button type="button" class="btn-back" id="survivalBackBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            <span>Exit Survival</span>
+          </button>
+          <div>
+            <h1 id="survivalTitle" class="section-title">Survival Arena 🛡️</h1>
+            <p class="section-subtitle">Answer as many questions as you can. 3 mistakes and you're out!</p>
+          </div>
+        </div>
+
+        <div class="puzzle-arena-card">
+          <div class="survival-hearts-bar" id="survivalHeartsMeter">
+            <span class="heart-icon">❤️</span>
+            <span class="heart-icon">❤️</span>
+            <span class="heart-icon">❤️</span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">
+            <span>Streak: <strong id="survivalStreakVal" style="color: var(--accent-orange);">0</strong> 🔥</span>
+            <span>Best Survival: <strong id="survivalBestVal">0</strong></span>
+          </div>
+
+          <h2 class="question-text" id="survivalQuestionText">Loading survival challenge...</h2>
+          <div class="options-list" id="survivalOptionsContainer"></div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SCREEN: RIDDLE CHALLENGE                   -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewRiddles" aria-labelledby="riddlesTitle">
+        <div class="view-header" style="align-items: flex-start;">
+          <button type="button" class="btn-back" id="riddlesBackBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            <span>Exit Riddles</span>
+          </button>
+          <div>
+            <h1 id="riddlesTitle" class="section-title">Riddle Challenge 🔮</h1>
+            <p class="section-subtitle">Exercise your lateral thinking with clever deductive riddles.</p>
+          </div>
+        </div>
+
+        <div class="puzzle-arena-card">
+          <span class="badge badge-accent" id="riddleCategoryTag">Logic & Wit</span>
+          <h2 class="question-text" id="riddleQuestionText" style="margin: 16px 0 20px;">I speak without a mouth and hear without ears. I have no body, but I come alive with wind. What am I?</h2>
+
+          <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+            <button type="button" class="btn btn-secondary" id="showRiddleHintBtn">Show Hint 💡</button>
+            <button type="button" class="btn btn-primary" id="revealRiddleAnswerBtn">Reveal Answer 🔍</button>
+          </div>
+
+          <div id="riddleHintBox" style="background: var(--bg-subtle); padding: 12px; border-radius: var(--radius-md); font-size: 0.9rem; display: none; margin-bottom: 12px;">
+            <strong>Hint:</strong> You might hear it in a canyon or empty auditorium.
+          </div>
+
+          <div id="riddleAnswerBox" style="background: #f0fdf4; border: 1.5px solid #86efac; color: #166534; padding: 14px; border-radius: var(--radius-md); font-size: 1rem; font-weight: 800; display: none; margin-bottom: 16px;">
+            Answer: An Echo! 🔊
+          </div>
+
+          <button type="button" class="btn btn-secondary" id="nextRiddleBtn" style="width: 100%;">Next Riddle →</button>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Global Footer -->
+    <footer class="app-footer" role="contentinfo" aria-label="QuizUp Footer">
+      <div class="footer-inner container">
+        <div class="footer-brand">
+          <span class="footer-logo">QuizUp <span class="logo-sparkle" aria-hidden="true">✦</span></span>
+          <p class="footer-tagline">“Master something new, one question at a time.”</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- PERSISTENT MOBILE BOTTOM NAVIGATION BAR    -->
+    <!-- ========================================== -->
+    <nav class="bottom-nav-bar" id="bottomNavBar" aria-label="Mobile Navigation">
+      <button type="button" class="bottom-nav-item active" id="bottomNavRankings" aria-label="Leaderboard Rankings">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1v-2.34"></path><path d="M18 14.66V17c0 .55-.45 1-1 1h-2c-.55 0-1-.45-1-1v-2.34"></path><path d="M6 2h12v7a6 6 0 0 1-12 0V2z"></path></svg>
+        <span>Rankings</span>
+      </button>
+
+      <button type="button" class="bottom-nav-item" id="bottomNavDiscover" aria-label="Discover Categories">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+        <span>Discover</span>
+      </button>
+
+      <button type="button" class="bottom-nav-item play-center-btn" id="bottomNavPlay" aria-label="Play Games Arena">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        <span>Play</span>
+      </button>
+
+      <button type="button" class="bottom-nav-item" id="bottomNavRewards" aria-label="Rewards and Badges">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
+        <span>Rewards</span>
+      </button>
+
+      <button type="button" class="bottom-nav-item" id="bottomNavProfile" aria-label="Profile and Stats">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        <span>Profile</span>
+      </button>
+    </nav>
+
+    <!-- Confirmation Modal (for Quitting Quiz) -->
+    <div class="modal-backdrop" id="quitModal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="quitModalTitle">
+      <div class="modal-card">
+        <div class="modal-icon lavender">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        </div>
+        <h3 class="modal-title" id="quitModalTitle">Quit Current Quiz?</h3>
+        <p class="modal-desc">Your current quiz progress will not be recorded to your dashboard statistics if you leave now.</p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="cancelQuitBtn">Keep Going</button>
+          <button type="button" class="btn btn-danger" id="confirmQuitBtn">Yes, Return Home</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirmation Modal (for Unanswered Questions in Exam Mode) -->
+    <div class="modal-backdrop" id="unansweredModal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="unansweredModalTitle">
+      <div class="modal-card">
+        <div class="modal-icon amber">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        </div>
+        <h3 class="modal-title" id="unansweredModalTitle">Unanswered Questions Remaining</h3>
+        <p class="modal-desc" id="unansweredModalDesc">You have unanswered questions. Are you sure you want to finalize your exam submission now, or return to review them?</p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="reviewUnansweredBtn">Review Questions</button>
+          <button type="button" class="btn btn-primary" id="confirmSubmitUnansweredBtn">Submit Anyway</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirmation Modal (for Resetting Progress) -->
+    <div class="modal-backdrop" id="resetModal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="resetModalTitle">
+      <div class="modal-card">
+        <div class="modal-icon" style="background: #fee2e2; color: #dc2626;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        </div>
+        <h3 class="modal-title" id="resetModalTitle">Reset All Career Data?</h3>
+        <p class="modal-desc">This will erase all your coins, quiz attempts, personal bests, and reset your avatar and title. This action cannot be undone.</p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="cancelResetBtn">Keep Progress</button>
+          <button type="button" class="btn btn-danger" id="confirmResetBtn">Yes, Reset Everything</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- INTERACTIVE PLAYER DETAIL MODAL            -->
+    <!-- ========================================== -->
+    <div class="modal-backdrop" id="playerDetailModal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="playerModalName">
+      <div class="modal-card player-modal-card">
+        <button type="button" class="modal-close-btn" id="closePlayerModalBtn" aria-label="Close player profile">✕</button>
+        <div class="player-modal-header">
+          <div class="player-modal-avatar-wrap">
+            <span class="player-modal-avatar" id="playerModalAvatar">👑</span>
+            <span class="player-modal-rank-badge" id="playerModalRank">#1</span>
+          </div>
+          <h3 class="modal-title" id="playerModalName">Aria Stark</h3>
+          <span class="badge badge-accent" id="playerModalTier">Master</span>
+          <p class="player-modal-type-tag" id="playerModalType">Simulated Community Competitor</p>
+        </div>
+        <div class="player-modal-stats-grid">
+          <div class="modal-stat-box">
+            <span class="modal-stat-val" id="playerModalAccuracy">100%</span>
+            <span class="modal-stat-lbl">Accuracy</span>
+          </div>
+          <div class="modal-stat-box">
+            <span class="modal-stat-val" id="playerModalCoins">🪙 480</span>
+            <span class="modal-stat-lbl">Coins Earned</span>
+          </div>
+          <div class="modal-stat-box">
+            <span class="modal-stat-val" id="playerModalDiscipline">Technology</span>
+            <span class="modal-stat-lbl">Top Discipline</span>
+          </div>
+          <div class="modal-stat-box">
+            <span class="modal-stat-val" id="playerModalStreak">🔥 7 Days</span>
+            <span class="modal-stat-lbl">Activity Streak</span>
+          </div>
+        </div>
+        <div class="modal-actions" style="margin-top: 18px;">
+          <button type="button" class="btn btn-primary" id="playerModalPlayBtn" style="width: 100%;">Challenge in Arena ⚡</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- INTERACTIVE BADGE DETAIL MODAL             -->
+    <!-- ========================================== -->
+    <div class="modal-backdrop" id="badgeDetailModal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="badgeModalTitle">
+      <div class="modal-card badge-modal-card">
+        <button type="button" class="modal-close-btn" id="closeBadgeModalBtn" aria-label="Close badge details">✕</button>
+        <div class="badge-modal-header">
+          <div class="badge-modal-icon-wrap" id="badgeModalIconWrap">
+            <span class="badge-modal-icon" id="badgeModalEmoji">🌟</span>
+          </div>
+          <h3 class="modal-title" id="badgeModalTitle">First Step</h3>
+          <span class="badge-status-pill status-unlocked" id="badgeModalStatus">✓ Unlocked</span>
+        </div>
+        <p class="modal-desc" id="badgeModalDesc" style="margin: 12px 0 16px;">Complete your first quiz in any subject.</p>
+        
+        <div class="badge-modal-progress-section" id="badgeModalProgressSection">
+          <div class="badge-progress-header">
+            <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted);">Achievement Progress</span>
+            <span style="font-size: 0.85rem; font-weight: 800; color: var(--primary);" id="badgeModalProgressPct">100%</span>
+          </div>
+          <div class="badge-modal-progress-track">
+            <div class="badge-modal-progress-fill" id="badgeModalProgressFill" style="width: 100%;"></div>
+          </div>
+          <span class="badge-modal-progress-label" id="badgeModalProgressLabel">1 / 1 quiz completed</span>
+        </div>
+
+        <div class="badge-modal-tip-box" id="badgeModalTipBox">
+          <span aria-hidden="true">💡</span>
+          <span id="badgeModalTipText">Earn coins and maintain daily streaks to level up your achievement collection!</span>
+        </div>
+
+        <div class="modal-actions" style="margin-top: 18px;">
+          <button type="button" class="btn btn-primary" id="badgeModalActionBtn" style="width: 100%;">Play Quiz to Progress 🚀</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- GALLERY PHOTO PREVIEW MODAL                -->
+    <!-- ========================================== -->
+    <div class="modal-backdrop" id="photoPreviewModal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="photoPreviewTitle">
+      <div class="modal-card photo-preview-modal-card">
+        <button type="button" class="modal-close-btn" id="closePhotoPreviewBtn" aria-label="Cancel and close photo preview">✕</button>
+        <div class="modal-header">
+          <h3 class="modal-title" id="photoPreviewTitle">Set Profile Picture</h3>
+          <p class="modal-desc">Preview your selected image before saving to your local profile.</p>
+        </div>
+        <div class="photo-preview-box">
+          <img id="photoPreviewImg" src="" alt="Profile picture preview" class="photo-preview-image">
+        </div>
+        <div class="photo-preview-meta" id="photoPreviewMeta">
+          <span id="photoPreviewDimensions">200 × 200</span>
+          <span class="photo-preview-badge">Optimized for QuizUp</span>
+        </div>
+        <div class="modal-actions" style="margin-top: 20px;">
+          <button type="button" class="btn btn-secondary" id="cancelPhotoPreviewBtn">Cancel</button>
+          <button type="button" class="btn btn-primary" id="savePhotoPreviewBtn">Save Picture ✨</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- QUIZBUDDY LEARNING CHATBOT COMPONENT       -->
+    <!-- ========================================== -->
+    <!-- Floating Assistant Trigger Button -->
+    <button type="button" class="quizbuddy-floating-btn" id="quizBuddyFloatingBtn" aria-label="Open QuizBuddy Learning Assistant" title="Ask QuizBuddy">
+      <span class="qb-icon">🤖</span>
+      <span class="qb-pulse-ring"></span>
+      <span class="qb-floating-label">QuizBuddy</span>
+    </button>
+
+    <!-- QuizBuddy Slide-out / Popover Chat Panel -->
+    <div class="quizbuddy-chat-panel" id="quizBuddyChatPanel" style="display: none;" role="dialog" aria-modal="false" aria-labelledby="quizBuddyPanelTitle">
+      <div class="qb-panel-header">
+        <div class="qb-header-info">
+          <div class="qb-avatar-wrap">
+            <span class="qb-avatar">🤖</span>
+            <span class="qb-online-dot"></span>
+          </div>
+          <div>
+            <h3 class="qb-panel-title" id="quizBuddyPanelTitle">QuizBuddy</h3>
+            <span class="qb-panel-subtitle">Quiz &amp; Concept Learning Assistant</span>
+          </div>
+        </div>
+        <div class="qb-header-actions">
+          <button type="button" class="qb-header-btn" id="quizBuddyClearBtn" title="Clear chat history" aria-label="Clear chat">🗑️</button>
+          <button type="button" class="qb-header-btn" id="quizBuddyCloseBtn" title="Close QuizBuddy" aria-label="Close QuizBuddy">✕</button>
+        </div>
+      </div>
+
+      <!-- Suggested Prompt Chips Strip -->
+      <div class="qb-prompts-strip" id="quizBuddyPromptsStrip">
+        <button type="button" class="qb-prompt-chip" data-prompt="Explain this topic simply">💡 Explain topic simply</button>
+        <button type="button" class="qb-prompt-chip" data-prompt="Why is my answer incorrect?">❓ Why is my answer incorrect?</button>
+        <button type="button" class="qb-prompt-chip" data-prompt="Give me an example">🔍 Give me an example</button>
+        <button type="button" class="qb-prompt-chip" data-prompt="Quiz me on this topic">🎯 Quiz me on a question</button>
+      </div>
+
+      <!-- Message History Container -->
+      <div class="qb-messages-container" id="quizBuddyMessages" role="log" aria-live="polite">
+        <!-- Messages rendered dynamically -->
+      </div>
+
+      <!-- Typing Indicator -->
+      <div class="qb-typing-indicator" id="quizBuddyTyping" style="display: none;">
+        <span></span><span></span><span></span>
+        <span class="qb-typing-text">QuizBuddy is thinking...</span>
+      </div>
+
+      <!-- Input Form -->
+      <form class="qb-input-form" id="quizBuddyForm" onsubmit="return false;">
+        <textarea class="qb-input-field" id="quizBuddyInput" placeholder="Ask about a quiz topic, concept, or paste a question..." rows="1" maxlength="500"></textarea>
+        <button type="button" class="qb-send-btn" id="quizBuddySendBtn" aria-label="Send message">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
+      </form>
+      <div class="qb-footer-note">
+        <span>⚡ Local assistant running in-browser • Answers based on QuizUp question bank &amp; study concepts.</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Main JavaScript File -->
+  <script src="script.js"></script>
+</body>
+</html>
