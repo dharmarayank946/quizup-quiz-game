@@ -4085,6 +4085,13 @@ function switchView(targetViewId) {
     appState.currentView = targetViewId;
   }
 
+  // Handle auth screen states
+  const isAuthScreen = targetViewId === "viewLogin" || targetViewId === "viewRegister" || targetViewId === "viewAuth";
+  const bottomNavBar = document.getElementById("bottomNavBar");
+  if (bottomNavBar) {
+    bottomNavBar.style.display = isAuthScreen ? "none" : "flex";
+  }
+
   // Update desktop header nav buttons
   const navHomeBtn = document.getElementById("navHomeBtn");
   const navNewQuizBtn = document.getElementById("navNewQuizBtn");
@@ -4094,6 +4101,10 @@ function switchView(targetViewId) {
   }
   if (navNewQuizBtn) {
     navNewQuizBtn.classList.toggle("active", targetViewId === "viewPlay" || targetViewId === "viewSetup");
+  }
+  const navAuthBtn = document.getElementById("navAuthBtn");
+  if (navAuthBtn) {
+    navAuthBtn.classList.toggle("active", isAuthScreen);
   }
 
   // Update mobile bottom nav buttons (Rankings, Discover, Play, Rewards, Profile)
@@ -4114,6 +4125,8 @@ function switchView(targetViewId) {
     renderDashboardStats();
     renderDailyGrowthTip();
     syncProfileUI();
+  } else if (isAuthScreen) {
+    syncAuthUI();
   } else if (targetViewId === "viewLeaderboard") {
     renderLeaderboard(currentLeaderboardTimeframe);
     renderDailyGrowthTip();
@@ -5615,6 +5628,386 @@ function savePlayerProfile(profile) {
     localStorage.setItem(GAMING_STORAGE_KEY, JSON.stringify(profile));
   } catch (err) {}
   syncProfileUI();
+}
+
+// ==========================================================================
+// 8B. User Authentication & Session Management (Soft Candy Theme)
+// Note: Passwords are NEVER saved in localStorage or client cookies.
+// Production multi-user authentication requires an external secure backend.
+// ==========================================================================
+const AUTH_STORAGE_KEY = "quizup_auth_user";
+const AUTH_SESSION_KEY = "quizup_auth_session";
+
+function getAuthUser() {
+  try {
+    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+    if (!raw) return { isDemo: true, displayName: "Demo Player", email: "" };
+    return JSON.parse(raw);
+  } catch (err) {
+    return { isDemo: true, displayName: "Demo Player", email: "" };
+  }
+}
+
+function setAuthUser(user) {
+  try {
+    // SECURITY SAFEGUARD: Never persist password in localStorage
+    const safeUser = {
+      displayName: user.displayName || "Demo Player",
+      email: user.email || "",
+      isDemo: Boolean(user.isDemo),
+      loginDate: user.loginDate || new Date().toISOString()
+    };
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(safeUser));
+    localStorage.setItem(AUTH_SESSION_KEY, safeUser.isDemo ? "demo" : "user");
+  } catch (err) {}
+  syncAuthUI();
+}
+
+function syncAuthUI() {
+  const user = getAuthUser();
+  const navAuthText = document.getElementById("navAuthText");
+  if (navAuthText) {
+    navAuthText.textContent = user.isDemo ? "Sign In" : user.displayName;
+  }
+  const profileAccountBadge = document.getElementById("profileAccountBadge");
+  if (profileAccountBadge) {
+    profileAccountBadge.textContent = user.isDemo 
+      ? "🎮 Guest Player (Local Storage)" 
+      : `👤 ${user.displayName} (${user.email || "Signed In"})`;
+  }
+}
+
+function initAuthScreen() {
+  initLoginScreen();
+  initRegisterScreen();
+}
+
+function initLoginScreen() {
+  const loginForm = document.getElementById("loginForm");
+  const loginEmailInput = document.getElementById("loginEmailInput");
+  const loginPasswordInput = document.getElementById("loginPasswordInput");
+  const loginPwToggleBtn = document.getElementById("loginPwToggleBtn");
+  const loginPwToggleIcon = document.getElementById("loginPwToggleIcon");
+  const loginSubmitBtn = document.getElementById("loginSubmitBtn");
+  const loginSubmitBtnText = document.getElementById("loginSubmitBtnText");
+  const loginAlertBox = document.getElementById("loginAlertBox");
+  const loginAlertIcon = document.getElementById("loginAlertIcon");
+  const loginAlertText = document.getElementById("loginAlertText");
+  const loginDemoBtn = document.getElementById("loginDemoBtn");
+  const loginForgotPassLink = document.getElementById("loginForgotPassLink");
+  const loginRecoveryPanel = document.getElementById("loginRecoveryPanel");
+  const loginCloseRecoveryBtn = document.getElementById("loginCloseRecoveryBtn");
+  const loginSendRecoveryBtn = document.getElementById("loginSendRecoveryBtn");
+  const loginRecoveryEmailInput = document.getElementById("loginRecoveryEmailInput");
+  const loginToRegisterLink = document.getElementById("loginToRegisterLink");
+  const loginReturnDashboardBtn = document.getElementById("loginReturnDashboardBtn");
+
+  function showLoginAlert(msg, type = "error") {
+    if (!loginAlertBox || !loginAlertText) return;
+    loginAlertBox.className = `auth-alert ${type}`;
+    if (loginAlertIcon) {
+      loginAlertIcon.textContent = type === "success" ? "✅" : (type === "info" ? "ℹ️" : "⚠️");
+    }
+    loginAlertText.textContent = msg;
+    loginAlertBox.style.display = "flex";
+  }
+
+  function hideLoginAlert() {
+    if (loginAlertBox) loginAlertBox.style.display = "none";
+  }
+
+  // Show / Hide Password toggle
+  if (loginPwToggleBtn && loginPasswordInput) {
+    loginPwToggleBtn.addEventListener("click", () => {
+      const isPass = loginPasswordInput.type === "password";
+      loginPasswordInput.type = isPass ? "text" : "password";
+      if (loginPwToggleIcon) loginPwToggleIcon.textContent = isPass ? "🙈" : "👁️";
+      loginPwToggleBtn.setAttribute("aria-label", isPass ? "Hide password" : "Show password");
+    });
+  }
+
+  // Guest / Demo Access button
+  if (loginDemoBtn) {
+    loginDemoBtn.addEventListener("click", () => {
+      playGameSound("click");
+      setAuthUser({ isDemo: true, displayName: "Demo Player", email: "" });
+      hideLoginAlert();
+      switchView("viewLeaderboard");
+    });
+  }
+
+  // Form submission (Email + Password)
+  if (loginForm) {
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = loginEmailInput ? loginEmailInput.value.trim() : "";
+      const password = loginPasswordInput ? loginPasswordInput.value : "";
+
+      // Validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email || !emailRegex.test(email)) {
+        showLoginAlert("Please enter a valid email address.", "error");
+        if (loginEmailInput) loginEmailInput.focus();
+        return;
+      }
+
+      if (!password) {
+        showLoginAlert("Please enter your password.", "error");
+        if (loginPasswordInput) loginPasswordInput.focus();
+        return;
+      }
+
+      // Show brief loading state
+      if (loginSubmitBtn && loginSubmitBtnText) {
+        loginSubmitBtn.disabled = true;
+        loginSubmitBtnText.textContent = "Verifying Credentials...";
+      }
+
+      setTimeout(() => {
+        if (loginSubmitBtn && loginSubmitBtnText) {
+          loginSubmitBtn.disabled = false;
+          loginSubmitBtnText.textContent = "Sign In 🚀";
+        }
+
+        // Honest client-side explanation: Real cloud auth requires backend server
+        const displayName = email.split("@")[0];
+        setAuthUser({
+          displayName: displayName,
+          email: email,
+          isDemo: true,
+          loginDate: new Date().toISOString()
+        });
+
+        playGameSound("victory");
+        showLoginAlert(`Welcome, ${displayName}! (Notice: Backend authentication is in Client Demo mode. Local progress is preserved on this device).`, "info");
+
+        if (loginPasswordInput) loginPasswordInput.value = "";
+
+        setTimeout(() => {
+          hideLoginAlert();
+          switchView("viewLeaderboard");
+        }, 1200);
+      }, 500);
+    });
+  }
+
+  // Switch to Registration
+  if (loginToRegisterLink) {
+    loginToRegisterLink.addEventListener("click", () => {
+      playGameSound("click");
+      hideLoginAlert();
+      switchView("viewRegister");
+    });
+  }
+
+  // Password Recovery Panel Toggle
+  if (loginForgotPassLink && loginRecoveryPanel) {
+    loginForgotPassLink.addEventListener("click", () => {
+      loginRecoveryPanel.style.display = loginRecoveryPanel.style.display === "none" ? "block" : "none";
+      hideLoginAlert();
+    });
+  }
+
+  if (loginCloseRecoveryBtn && loginRecoveryPanel) {
+    loginCloseRecoveryBtn.addEventListener("click", () => {
+      loginRecoveryPanel.style.display = "none";
+    });
+  }
+
+  // Send Recovery Email action
+  if (loginSendRecoveryBtn && loginRecoveryEmailInput) {
+    loginSendRecoveryBtn.addEventListener("click", () => {
+      const recEmail = loginRecoveryEmailInput.value.trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!recEmail || !emailRegex.test(recEmail)) {
+        showLoginAlert("Please enter a valid email address for password recovery.", "error");
+        loginRecoveryEmailInput.focus();
+        return;
+      }
+      playGameSound("click");
+      showLoginAlert(`Password recovery simulated for ${recEmail}. Note: Automated delivery requires an active SMTP backend service.`, "info");
+      loginRecoveryEmailInput.value = "";
+      setTimeout(() => {
+        if (loginRecoveryPanel) loginRecoveryPanel.style.display = "none";
+      }, 2500);
+    });
+  }
+
+  // Return to Dashboard
+  if (loginReturnDashboardBtn) {
+    loginReturnDashboardBtn.addEventListener("click", () => {
+      playGameSound("click");
+      switchView("viewLeaderboard");
+    });
+  }
+}
+
+function initRegisterScreen() {
+  const registerForm = document.getElementById("registerForm");
+  const registerNameInput = document.getElementById("registerNameInput");
+  const registerEmailInput = document.getElementById("registerEmailInput");
+  const registerPasswordInput = document.getElementById("registerPasswordInput");
+  const registerConfirmPwInput = document.getElementById("registerConfirmPwInput");
+  const registerPwToggleBtn = document.getElementById("registerPwToggleBtn");
+  const registerPwToggleIcon = document.getElementById("registerPwToggleIcon");
+  const registerConfirmPwToggleBtn = document.getElementById("registerConfirmPwToggleBtn");
+  const registerConfirmPwToggleIcon = document.getElementById("registerConfirmPwToggleIcon");
+  const registerSubmitBtn = document.getElementById("registerSubmitBtn");
+  const registerSubmitBtnText = document.getElementById("registerSubmitBtnText");
+  const registerAlertBox = document.getElementById("registerAlertBox");
+  const registerAlertIcon = document.getElementById("registerAlertIcon");
+  const registerAlertText = document.getElementById("registerAlertText");
+  const registerToLoginLink = document.getElementById("registerToLoginLink");
+  const registerDemoBtn = document.getElementById("registerDemoBtn");
+  const pwRuleLength = document.getElementById("pwRuleLength");
+  const pwRuleMatch = document.getElementById("pwRuleMatch");
+
+  function showRegisterAlert(msg, type = "error") {
+    if (!registerAlertBox || !registerAlertText) return;
+    registerAlertBox.className = `auth-alert ${type}`;
+    if (registerAlertIcon) {
+      registerAlertIcon.textContent = type === "success" ? "✅" : (type === "info" ? "ℹ️" : "⚠️");
+    }
+    registerAlertText.textContent = msg;
+    registerAlertBox.style.display = "flex";
+  }
+
+  function hideRegisterAlert() {
+    if (registerAlertBox) registerAlertBox.style.display = "none";
+  }
+
+  // Real-time password requirement helper
+  function updatePwRules() {
+    const pw = registerPasswordInput ? registerPasswordInput.value : "";
+    const cpw = registerConfirmPwInput ? registerConfirmPwInput.value : "";
+
+    if (pwRuleLength) {
+      const okLen = pw.length >= 8;
+      pwRuleLength.className = okLen ? "valid" : "";
+      pwRuleLength.textContent = okLen ? "✓ At least 8 characters" : "At least 8 characters";
+    }
+    if (pwRuleMatch) {
+      const okMatch = Boolean(pw && cpw && pw === cpw);
+      pwRuleMatch.className = okMatch ? "valid" : "";
+      pwRuleMatch.textContent = okMatch ? "✓ Passwords match" : "Passwords must match";
+    }
+  }
+
+  if (registerPasswordInput) registerPasswordInput.addEventListener("input", updatePwRules);
+  if (registerConfirmPwInput) registerConfirmPwInput.addEventListener("input", updatePwRules);
+
+  // Show / Hide Password toggle
+  if (registerPwToggleBtn && registerPasswordInput) {
+    registerPwToggleBtn.addEventListener("click", () => {
+      const isPass = registerPasswordInput.type === "password";
+      registerPasswordInput.type = isPass ? "text" : "password";
+      if (registerPwToggleIcon) registerPwToggleIcon.textContent = isPass ? "🙈" : "👁️";
+      registerPwToggleBtn.setAttribute("aria-label", isPass ? "Hide password" : "Show password");
+    });
+  }
+
+  // Show / Hide Confirm Password toggle
+  if (registerConfirmPwToggleBtn && registerConfirmPwInput) {
+    registerConfirmPwToggleBtn.addEventListener("click", () => {
+      const isPass = registerConfirmPwInput.type === "password";
+      registerConfirmPwInput.type = isPass ? "text" : "password";
+      if (registerConfirmPwToggleIcon) registerConfirmPwToggleIcon.textContent = isPass ? "🙈" : "👁️";
+      registerConfirmPwToggleBtn.setAttribute("aria-label", isPass ? "Hide password" : "Show password");
+    });
+  }
+
+  // Switch to Login
+  if (registerToLoginLink) {
+    registerToLoginLink.addEventListener("click", () => {
+      playGameSound("click");
+      hideRegisterAlert();
+      switchView("viewLogin");
+    });
+  }
+
+  // Demo access from Register
+  if (registerDemoBtn) {
+    registerDemoBtn.addEventListener("click", () => {
+      playGameSound("click");
+      setAuthUser({ isDemo: true, displayName: "Demo Player", email: "" });
+      hideRegisterAlert();
+      switchView("viewLeaderboard");
+    });
+  }
+
+  // Form Submission
+  if (registerForm) {
+    registerForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = registerNameInput ? registerNameInput.value.trim() : "";
+      const email = registerEmailInput ? registerEmailInput.value.trim() : "";
+      const password = registerPasswordInput ? registerPasswordInput.value : "";
+      const confirmPw = registerConfirmPwInput ? registerConfirmPwInput.value : "";
+
+      // Validation
+      if (!name || name.length < 2) {
+        showRegisterAlert("Please enter a player display name (at least 2 characters).", "error");
+        if (registerNameInput) registerNameInput.focus();
+        return;
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email || !emailRegex.test(email)) {
+        showRegisterAlert("Please enter a valid email address.", "error");
+        if (registerEmailInput) registerEmailInput.focus();
+        return;
+      }
+
+      if (!password || password.length < 8) {
+        showRegisterAlert("Password must be at least 8 characters long.", "error");
+        if (registerPasswordInput) registerPasswordInput.focus();
+        return;
+      }
+
+      if (password !== confirmPw) {
+        showRegisterAlert("Passwords do not match. Please verify both fields.", "error");
+        if (registerConfirmPwInput) registerConfirmPwInput.focus();
+        return;
+      }
+
+      // Show brief loading state
+      if (registerSubmitBtn && registerSubmitBtnText) {
+        registerSubmitBtn.disabled = true;
+        registerSubmitBtnText.textContent = "Setting Up Profile...";
+      }
+
+      setTimeout(() => {
+        if (registerSubmitBtn && registerSubmitBtnText) {
+          registerSubmitBtn.disabled = false;
+          registerSubmitBtnText.textContent = "Create Account 🎉";
+        }
+
+        // Apply chosen name to local profile
+        const profile = getPlayerProfile();
+        profile.name = name;
+        savePlayerProfile(profile);
+
+        // Save session (SECURITY: DO NOT store password in localStorage)
+        setAuthUser({
+          displayName: name,
+          email: email,
+          isDemo: true,
+          loginDate: new Date().toISOString()
+        });
+
+        playGameSound("victory");
+        showRegisterAlert(`Account created! Player handle set to "${name}". (Notice: Operating in Client Demo mode; local progress is preserved).`, "info");
+
+        if (registerPasswordInput) registerPasswordInput.value = "";
+        if (registerConfirmPwInput) registerConfirmPwInput.value = "";
+
+        setTimeout(() => {
+          hideRegisterAlert();
+          switchView("viewLeaderboard");
+        }, 1200);
+      }, 500);
+    });
+  }
 }
 
 function addPlayerCoins(amount) {
@@ -8472,11 +8865,6 @@ function setupEventListeners() {
     heroDailyBtn.addEventListener("click", startDailySparkQuiz);
   }
 
-  const dailySparkCardBtn = document.getElementById("dailySparkCardBtn");
-  if (dailySparkCardBtn) {
-    dailySparkCardBtn.addEventListener("click", startDailySparkQuiz);
-  }
-
   // Mode Showcase Buttons on Dashboard
   const dashStartLearningBtn = document.getElementById("dashStartLearningBtn");
   if (dashStartLearningBtn) {
@@ -8493,18 +8881,6 @@ function setupEventListeners() {
       switchView("viewSetup");
     });
   }
-
-  // Featured Mini-Cards
-  const featuredCards = document.querySelectorAll(".featured-mini-card");
-  featuredCards.forEach((card) => {
-    card.addEventListener("click", () => {
-      const cat = card.dataset.quickCat;
-      const diff = card.dataset.quickDiff || "medium";
-      if (cat) appState.quizConfig.category = cat;
-      appState.quizConfig.difficulty = diff;
-      switchView("viewSetup");
-    });
-  });
 
   // Category Cards on Home
   const categoryCards = document.querySelectorAll(".category-card");
@@ -8777,6 +9153,24 @@ function setupEventListeners() {
       if (prof.soundEnabled) playGameSound("click");
     });
   }
+
+  const navAuthBtn = document.getElementById("navAuthBtn");
+  if (navAuthBtn) {
+    navAuthBtn.addEventListener("click", () => {
+      playGameSound("click");
+      switchView("viewLogin");
+    });
+  }
+
+  const profileAccountBtn = document.getElementById("profileAccountBtn");
+  if (profileAccountBtn) {
+    profileAccountBtn.addEventListener("click", () => {
+      playGameSound("click");
+      switchView("viewLogin");
+    });
+  }
+
+  initAuthScreen();
 
   // -------------------------------------------------------------
   // Play Hub Mode Cards
@@ -9948,6 +10342,7 @@ function setupEventListeners() {
     dashQbBtn.addEventListener("click", () => toggleQuizBuddy(true));
   }
 
+
   const qbCloseBtn = document.getElementById("quizBuddyCloseBtn");
   if (qbCloseBtn) {
     qbCloseBtn.addEventListener("click", () => toggleQuizBuddy(false));
@@ -10010,9 +10405,21 @@ document.addEventListener("DOMContentLoaded", () => {
   renderDailyGrowthTip();
   initQuizBuddy();
   syncProfileUI();
+  syncAuthUI();
 
-  // Screen 1: Leaderboard is the first screen on app launch
-  switchView("viewLeaderboard");
+  // Initial Screen Routing:
+  // Show Welcome & Login screen before main app for users who have not signed in or selected Guest mode.
+  // Returning visitors or active guest sessions proceed to the Leaderboard screen.
+  try {
+    const hasSession = localStorage.getItem(AUTH_SESSION_KEY);
+    if (!hasSession) {
+      switchView("viewLogin");
+    } else {
+      switchView("viewLeaderboard");
+    }
+  } catch (err) {
+    switchView("viewLeaderboard");
+  }
 
   // Screen 11: Auto-dismiss Splash Screen after 1.5s
   const splash = document.getElementById("splashScreen");

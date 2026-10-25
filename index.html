@@ -61,6 +61,10 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
             <span>Home</span>
           </button>
+          <button type="button" class="nav-btn" id="navAuthBtn" aria-label="Sign In or Account">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span id="navAuthText">Sign In</span>
+          </button>
         </nav>
 
         <!-- Header Gaming Badges (Coins, Streak, Sound, Avatar) -->
@@ -91,12 +95,233 @@
     <main class="main-content container" id="mainContent">
 
       <!-- ========================================== -->
+      <!-- SCREEN 0A: LOGIN (Soft Candy Theme)        -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewLogin" aria-labelledby="loginTitle">
+        <div class="auth-card-wrap">
+          <div class="auth-card">
+            <!-- Brand Badge & Header -->
+            <div class="auth-header">
+              <div class="auth-logo-badge" aria-hidden="true">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+              </div>
+              <div class="auth-brand-text">
+                <h1 id="loginTitle" class="auth-brand-name">QuizUp <span class="logo-sparkle">✦</span></h1>
+                <span class="auth-brand-edition">Gaming Edition</span>
+              </div>
+              <p class="auth-subtitle">Welcome back! Sign in to continue your quiz journey, track career stats, and compete on the leaderboard.</p>
+            </div>
+
+            <!-- Prominently Labeled Guest / Demo Mode -->
+            <div class="auth-demo-banner" role="region" aria-label="Guest Access">
+              <div class="auth-demo-badge">
+                <span class="auth-demo-icon" aria-hidden="true">🎮</span>
+                <div class="auth-demo-info">
+                  <strong class="auth-demo-title">Instant Guest / Demo Access</strong>
+                  <p class="auth-demo-desc">Play all quiz modes, multiplayer matches, and puzzles without creating an account. Career coins, XP, and streaks will be saved to this device.</p>
+                </div>
+              </div>
+              <button type="button" class="btn btn-primary auth-demo-btn" id="loginDemoBtn">
+                <span>Continue as Guest Player ⚡</span>
+              </button>
+            </div>
+
+            <!-- Divider -->
+            <div class="auth-divider">
+              <span>or sign in with email</span>
+            </div>
+
+            <!-- Alert Box for Validation & Feedback -->
+            <div class="auth-alert" id="loginAlertBox" style="display: none;" role="alert">
+              <span class="auth-alert-icon" id="loginAlertIcon">⚠️</span>
+              <span class="auth-alert-text" id="loginAlertText"></span>
+            </div>
+
+            <!-- Login Form -->
+            <form class="auth-form" id="loginForm" novalidate>
+              <!-- Email Input -->
+              <div class="auth-form-group">
+                <label for="loginEmailInput" class="auth-label">Email Address</label>
+                <div class="auth-input-wrap">
+                  <span class="auth-input-icon" aria-hidden="true">✉️</span>
+                  <input type="email" id="loginEmailInput" class="auth-input" placeholder="name@example.com" autocomplete="email" required>
+                </div>
+              </div>
+
+              <!-- Password Input with Show/Hide Toggle -->
+              <div class="auth-form-group">
+                <div class="auth-label-row">
+                  <label for="loginPasswordInput" class="auth-label">Password</label>
+                  <button type="button" class="auth-link-btn" id="loginForgotPassLink">Forgot password?</button>
+                </div>
+                <div class="auth-input-wrap">
+                  <span class="auth-input-icon" aria-hidden="true">🔒</span>
+                  <input type="password" id="loginPasswordInput" class="auth-input" placeholder="Enter your password" autocomplete="current-password" required>
+                  <button type="button" class="auth-pw-toggle-btn" id="loginPwToggleBtn" title="Show or hide password" aria-label="Show password">
+                    <span id="loginPwToggleIcon">👁️</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Submit Button with Loading State -->
+              <button type="submit" class="btn btn-primary auth-submit-btn" id="loginSubmitBtn">
+                <span id="loginSubmitBtnText">Sign In 🚀</span>
+              </button>
+            </form>
+
+            <!-- Inline Password Recovery Panel (Initially hidden) -->
+            <div class="auth-recovery-panel" id="loginRecoveryPanel" style="display: none;">
+              <div class="auth-recovery-header">
+                <h4 class="auth-recovery-title">🔑 Password Recovery</h4>
+                <button type="button" class="auth-recovery-close-btn" id="loginCloseRecoveryBtn" aria-label="Close recovery panel">✕</button>
+              </div>
+              <p class="auth-recovery-desc">Enter your email address to receive password reset instructions.</p>
+              <div class="auth-input-wrap" style="margin-bottom: 12px;">
+                <span class="auth-input-icon" aria-hidden="true">✉️</span>
+                <input type="email" id="loginRecoveryEmailInput" class="auth-input" placeholder="registered@example.com">
+              </div>
+              <button type="button" class="btn btn-secondary auth-recovery-btn" id="loginSendRecoveryBtn">Send Reset Link 📨</button>
+              <p class="auth-recovery-notice">
+                <strong>Backend Requirement:</strong> Automated password reset emails require an active SMTP or cloud email service (e.g. SendGrid, Postmark, AWS SES). In client-only demo mode, your local profile and avatar can be edited or reset anytime in Profile Settings.
+              </p>
+            </div>
+
+            <!-- Switch to Registration Link -->
+            <div class="auth-switch-row">
+              <span>Don't have an account?</span>
+              <button type="button" class="auth-switch-link" id="loginToRegisterLink">Create an Account →</button>
+            </div>
+
+            <!-- Security Notice -->
+            <div class="auth-security-footer">
+              <span class="security-shield">🔒</span>
+              <p><strong>Security Notice:</strong> Passwords are <em>never</em> stored in localStorage or browser cookies. Production multi-user authentication requires a secure cloud backend service.</p>
+            </div>
+
+            <!-- Return / Back to Dashboard Link -->
+            <div class="auth-return-wrap">
+              <button type="button" class="btn-text-subtle" id="loginReturnDashboardBtn">← Continue to Dashboard</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SCREEN 0B: REGISTRATION (Soft Candy Theme) -->
+      <!-- ========================================== -->
+      <section class="view-section" id="viewRegister" aria-labelledby="registerTitle">
+        <div class="auth-card-wrap">
+          <div class="auth-card">
+            <!-- Brand Badge & Header -->
+            <div class="auth-header">
+              <div class="auth-logo-badge" aria-hidden="true">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+              </div>
+              <div class="auth-brand-text">
+                <h1 id="registerTitle" class="auth-brand-name">Create Account <span class="logo-sparkle">✦</span></h1>
+                <span class="auth-brand-edition">QuizUp Gaming</span>
+              </div>
+              <p class="auth-subtitle">Join the QuizUp community! Pick your player name, track your streak, and start mastering quizzes.</p>
+            </div>
+
+            <!-- Alert Box for Validation & Feedback -->
+            <div class="auth-alert" id="registerAlertBox" style="display: none;" role="alert">
+              <span class="auth-alert-icon" id="registerAlertIcon">⚠️</span>
+              <span class="auth-alert-text" id="registerAlertText"></span>
+            </div>
+
+            <!-- Registration Form -->
+            <form class="auth-form" id="registerForm" novalidate>
+              <!-- Name Input -->
+              <div class="auth-form-group">
+                <label for="registerNameInput" class="auth-label">Player Display Name</label>
+                <div class="auth-input-wrap">
+                  <span class="auth-input-icon" aria-hidden="true">👤</span>
+                  <input type="text" id="registerNameInput" class="auth-input" placeholder="e.g. Alex Quizzer" maxlength="24" required>
+                </div>
+              </div>
+
+              <!-- Email Input -->
+              <div class="auth-form-group">
+                <label for="registerEmailInput" class="auth-label">Email Address</label>
+                <div class="auth-input-wrap">
+                  <span class="auth-input-icon" aria-hidden="true">✉️</span>
+                  <input type="email" id="registerEmailInput" class="auth-input" placeholder="name@example.com" autocomplete="email" required>
+                </div>
+              </div>
+
+              <!-- Password Input with Show/Hide Toggle -->
+              <div class="auth-form-group">
+                <label for="registerPasswordInput" class="auth-label">Password</label>
+                <div class="auth-input-wrap">
+                  <span class="auth-input-icon" aria-hidden="true">🔒</span>
+                  <input type="password" id="registerPasswordInput" class="auth-input" placeholder="At least 8 characters" autocomplete="new-password" required>
+                  <button type="button" class="auth-pw-toggle-btn" id="registerPwToggleBtn" title="Show or hide password" aria-label="Show password">
+                    <span id="registerPwToggleIcon">👁️</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Confirm Password Input with Show/Hide Toggle -->
+              <div class="auth-form-group">
+                <label for="registerConfirmPwInput" class="auth-label">Confirm Password</label>
+                <div class="auth-input-wrap">
+                  <span class="auth-input-icon" aria-hidden="true">🔒</span>
+                  <input type="password" id="registerConfirmPwInput" class="auth-input" placeholder="Re-enter your password" autocomplete="new-password" required>
+                  <button type="button" class="auth-pw-toggle-btn" id="registerConfirmPwToggleBtn" title="Show or hide confirm password" aria-label="Show confirm password">
+                    <span id="registerConfirmPwToggleIcon">👁️</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Password Requirements Box -->
+              <div class="auth-pw-rules">
+                <span class="pw-rule-title">Password requirements:</span>
+                <ul class="pw-rule-list">
+                  <li id="pwRuleLength">At least 8 characters</li>
+                  <li id="pwRuleMatch">Passwords must match</li>
+                </ul>
+              </div>
+
+              <!-- Submit Button -->
+              <button type="submit" class="btn btn-primary auth-submit-btn" id="registerSubmitBtn">
+                <span id="registerSubmitBtnText">Create Account 🎉</span>
+              </button>
+            </form>
+
+            <!-- Switch back to Login -->
+            <div class="auth-switch-row">
+              <span>Already have an account?</span>
+              <button type="button" class="auth-switch-link" id="registerToLoginLink">Sign In Instead →</button>
+            </div>
+
+            <!-- Instant Demo Access Option -->
+            <div class="auth-secondary-demo">
+              <button type="button" class="btn btn-secondary auth-demo-btn-secondary" id="registerDemoBtn">
+                <span>Skip & Continue as Guest ⚡</span>
+              </button>
+            </div>
+
+            <!-- Security Notice -->
+            <div class="auth-security-footer">
+              <span class="security-shield">🔒</span>
+              <p><strong>Security Notice:</strong> Passwords are <em>never</em> stored in localStorage or browser cookies. Production multi-user authentication requires a secure cloud backend service.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
       <!-- SCREEN 1: LEADERBOARD (First on App Launch) -->
       <!-- ========================================== -->
       <section class="view-section active" id="viewLeaderboard" aria-labelledby="leaderboardTitle">
         <div class="leaderboard-container">
           <div class="leaderboard-header">
-            <span class="leaderboard-title-badge">👑 Global Standings</span>
+            <span class="leaderboard-title-badge">🏆 Community Standings</span>
             <h1 id="leaderboardTitle" class="leaderboard-title">Leaderboard</h1>
             <p class="leaderboard-subtitle">Climb the ranks, earn coins, and showcase your intellectual prowess.</p>
           </div>
@@ -303,75 +528,6 @@
         <!-- Section 2: Your Daily Growth Tip on Dashboard -->
         <div class="daily-growth-tip-card dashboard-tip-card" id="dashboardGrowthTipCard" role="region" aria-label="Your Daily Growth Tip">
           <!-- Rendered via JS renderDailyGrowthTip() -->
-        </div>
-
-        <!-- QuizBuddy Spotlight Card on Dashboard -->
-        <div class="quizbuddy-spotlight-card" id="quizBuddyDashboardCard" role="region" aria-label="QuizBuddy Assistant Card">
-          <div class="qb-spotlight-inner">
-            <div class="qb-spotlight-left">
-              <div class="qb-spotlight-avatar" aria-hidden="true">🤖</div>
-              <div class="qb-spotlight-text">
-                <span class="qb-badge">LOCAL LEARNING COMPANION</span>
-                <h3 class="qb-title">Meet QuizBuddy — Your Interactive Study Assistant</h3>
-                <p class="qb-desc">Have questions about a quiz topic or missed an answer? Ask QuizBuddy for beginner-friendly explanations and instant concept drills.</p>
-                <div class="qb-prompts-preview">
-                  <button type="button" class="qb-quick-prompt-btn" data-prompt="Why is my answer incorrect?">💡 Why is my answer incorrect?</button>
-                  <button type="button" class="qb-quick-prompt-btn" data-prompt="Explain this topic simply">📖 Explain this topic simply</button>
-                  <button type="button" class="qb-quick-prompt-btn" data-prompt="Quiz me on this topic">🎯 Quiz me on a topic</button>
-                </div>
-              </div>
-            </div>
-            <button type="button" class="btn btn-primary" id="openQuizBuddyBtn">Chat with QuizBuddy 🤖</button>
-          </div>
-        </div>
-
-        <!-- Daily Challenge & Featured Quizzes Banner -->
-        <div class="section-block daily-featured-wrap">
-          <div class="daily-card" id="dailyChallengeCard">
-            <div class="daily-badge-row">
-              <span class="daily-pill">DAILY CHALLENGE ⚡</span>
-              <span class="daily-timer-hint">Quick 3-Min Sprint</span>
-            </div>
-            <div class="daily-content">
-              <h3 class="daily-title">Today's Knowledge Spark</h3>
-              <p class="daily-desc">Sharpen your reflexes with a 5-question daily practice session across mixed disciplines with instant conceptual explanations.</p>
-            </div>
-            <button type="button" class="btn btn-sparkle-large" id="dailySparkCardBtn">
-              <span>Launch Daily Spark</span>
-              <span class="arrow-sparkle">⚡</span>
-            </button>
-          </div>
-
-          <!-- Featured Quizzes Bar -->
-          <div class="featured-strip">
-            <h4 class="featured-strip-title">🔥 Featured Practice Sets</h4>
-            <div class="featured-cards-grid">
-              <button type="button" class="featured-mini-card" data-quick-cat="technology" data-quick-diff="easy">
-                <span class="mini-icon purple">💻</span>
-                <div class="mini-info">
-                  <span class="mini-title">Coding Foundations</span>
-                  <span class="mini-sub">HTML, CSS & JS Basics</span>
-                </div>
-                <span class="mini-arrow">→</span>
-              </button>
-              <button type="button" class="featured-mini-card" data-quick-cat="competitive" data-quick-diff="medium">
-                <span class="mini-icon indigo">🧠</span>
-                <div class="mini-info">
-                  <span class="mini-title">Logical Reasoning</span>
-                  <span class="mini-sub">Aptitude & Puzzles</span>
-                </div>
-                <span class="mini-arrow">→</span>
-              </button>
-              <button type="button" class="featured-mini-card" data-quick-cat="academics" data-quick-diff="medium">
-                <span class="mini-icon teal">🔬</span>
-                <div class="mini-info">
-                  <span class="mini-title">Scientific Discovery</span>
-                  <span class="mini-sub">Physics, Chem & Bio</span>
-                </div>
-                <span class="mini-arrow">→</span>
-              </button>
-            </div>
-          </div>
         </div>
 
         <!-- 6 Subject Categories Grid Section -->
@@ -1366,6 +1522,7 @@
 
             <!-- Quick Action Links -->
             <div class="profile-quick-actions">
+              <button type="button" class="btn btn-secondary btn-sm" id="profileAccountBtn">👤 Account / Sign In</button>
               <button type="button" class="btn btn-secondary btn-sm" id="profileOpenSettingsBtn">⚙️ Settings & Preferences</button>
               <button type="button" class="btn btn-secondary btn-sm" id="openAvatarStudioBtn">🎨 Avatar Studio</button>
               <button type="button" class="btn btn-secondary btn-sm" id="openThemeStudioBtn">🌈 Theme Studio</button>

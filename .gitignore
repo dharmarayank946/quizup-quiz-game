@@ -3,6 +3,12 @@ scratch/
 tests/
 coverage/
 
+# Archives & zips
+*.zip
+*.tar.gz
+*.rar
+
+
 # Dependencies
 node_modules/
 

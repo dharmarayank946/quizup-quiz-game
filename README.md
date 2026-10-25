@@ -192,3 +192,19 @@ Then visit the printed localhost URL (e.g. `http://localhost:3000` or `http://lo
 
 ### Option C: VS Code / IDE Live Server
 If you use VS Code, right-click `index.html` and select **"Open with Live Server"**.
+
+### Option D: Python Built-In Server
+Run directly from PowerShell or terminal:
+```bash
+python -m http.server 3000 --bind 127.0.0.1
+```
+Then open `http://localhost:3000` in your web browser.
+
+---
+
+## 🔒 Authentication & Data Safety Architecture
+- **Client-Side Session Management**: Features dedicated Login (`viewLogin`) and Registration (`viewRegister`) screens with input validation, password length checks, matching password verification, and show/hide toggles.
+- **Strict Data Safety**: Passwords are **never** stored in `localStorage`, cookies, or client-side storage.
+- **Honest Guest / Demo Mode**: Instant guest access lets users play immediately without an account. In-app notices clearly explain when features are running in client demo mode and what external backend (OAuth / SMTP) is required for production server integration.
+- **Safe Persistence**: `localStorage` is used exclusively for non-sensitive data: player avatar persona, coins, streaks, XP, custom photo gallery uploads, recent quiz attempts, and category high scores.
+
